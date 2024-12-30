@@ -128,7 +128,7 @@ public class PrinterManager implements ReceiveListener {
 
     // 打印数据
     public boolean printData(PrinterCallback callback) {
-        if (mPrinter == null) {
+        if (!isPrinterInitialized()) {
             if (callback != null) {
                 callback.onError("Printer not initialized");
             }
@@ -137,20 +137,21 @@ public class PrinterManager implements ReceiveListener {
 
         try {
             mPrinter.sendData(Printer.PARAM_DEFAULT);
-
-            mPrinter.clearCommandBuffer();
-            mPrinter = null; // 清空打印机对象
+            log("Data sent to printer successfully.");
 
             if (callback != null) {
                 callback.onSuccess();
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            logError("Error sending print data", e);
             if (callback != null) {
                 callback.onError(e.getMessage());
             }
             return false;
+        } finally {
+            // log("Finalizing printer after printData.");
+            // finalizePrinter();
         }
     }
 
@@ -162,9 +163,8 @@ public class PrinterManager implements ReceiveListener {
         }
         try {
             log("Finalizing printer resources");
-            mPrinter.clearCommandBuffer();
-            mPrinter.disconnect();
-        } catch (Epos2Exception e) {
+            disconnectPrinter(context); // 确保打印机被断开连接
+        } catch (Exception e) {
             logError("Error during printer finalization", e);
         } finally {
             mPrinter = null;
@@ -189,19 +189,6 @@ public class PrinterManager implements ReceiveListener {
     public void onPtrReceive(final Printer printerObj, final int code, final PrinterStatusInfo status,
             final String printJobId) {
 
-        // uiHandler.post(new Runnable() {
-        // @Override
-        // public synchronized void run() {
-        // ShowMsg.showResult(code, makeErrorMessage(status), context);
-        // new Thread(new Runnable() {
-        // @Override
-        // public void run() {
-        // disconnectPrinter(context);
-        // }
-        // }).start();
-        // }
-        // });
-
         log("Received print event with code: " + code);
         uiHandler.post(() -> {
             ShowMsg.showResult(code, makeErrorMessage(status), context);
@@ -210,46 +197,43 @@ public class PrinterManager implements ReceiveListener {
     }
 
     private void disconnectPrinter(Context context) {
+        log("Attempting to disconnect printer...");
         if (mPrinter == null) {
+            log("No printer to disconnect.");
             return;
         }
 
         while (true) {
             try {
                 mPrinter.disconnect();
+                log("Printer disconnected successfully.");
                 break;
-            } catch (final Exception e) {
-                if (e instanceof Epos2Exception) {
-                    // Note: If printer is processing such as printing and so on, the disconnect API
-                    // returns ERR_PROCESSING.
-                    if (((Epos2Exception) e).getErrorStatus() == Epos2Exception.ERR_PROCESSING) {
-                        try {
-                            Thread.sleep(DISCONNECT_INTERVAL);
-                        } catch (Exception ex) {
-                        }
-                    } else {
-
-                        uiHandler.post(new Runnable() {
-                            public synchronized void run() {
-                                ShowMsg.showException(e, "disconnect", context);
-                            }
-                        });
-
-                        break;
+            } catch (Epos2Exception e) {
+                if (e.getErrorStatus() == Epos2Exception.ERR_PROCESSING) {
+                    log("Printer is still processing. Retrying...");
+                    try {
+                        Thread.sleep(DISCONNECT_INTERVAL);
+                    } catch (InterruptedException ex) {
+                        logError("Thread interrupted during disconnect retry", ex);
                     }
                 } else {
-                    uiHandler.post(new Runnable() {
-                        public synchronized void run() {
-                            ShowMsg.showException(e, "disconnect", context);
-                        }
-                    });
-
+                    logError("Error during printer disconnect", e);
                     break;
                 }
+            } catch (Exception e) {
+                logError("Unknown error during disconnectPrinter", e);
+                break;
             }
         }
 
-        mPrinter.clearCommandBuffer();
+        try {
+            mPrinter.clearCommandBuffer();
+            log("Command buffer cleared.");
+        } catch (Exception e) {
+            logError("Error clearing command buffer", e);
+        } finally {
+            mPrinter = null;
+        }
     }
 
     private String makeErrorMessage(PrinterStatusInfo status) {
@@ -306,6 +290,47 @@ public class PrinterManager implements ReceiveListener {
         }
 
         return msg;
+    }
+
+    public boolean checkPrinterStatus(Context context) {
+        if (!isPrinterInitialized()) {
+            return false;
+        }
+
+        PrinterStatusInfo status = mPrinter.getStatus();
+        if (!isPrinterReady(status, context)) {
+            log("Printer is not ready: " + makeErrorMessage(status));
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean reconnectPrinter(String target, Context context) {
+        try {
+            log("Reconnecting to printer: " + target);
+            mPrinter.connect(target, Printer.PARAM_DEFAULT);
+            return true;
+        } catch (Epos2Exception e) {
+            logError("Failed to reconnect to printer", e);
+            return false;
+        }
+    }
+
+    private boolean isPrinterReady(PrinterStatusInfo status, Context context) {
+        if (status.getOnline() == Printer.FALSE) {
+            ShowMsg.showMsg("Printer is offline", context);
+            return false;
+        }
+        if (status.getPaper() == Printer.PAPER_EMPTY) {
+            ShowMsg.showMsg("Printer is out of paper", context);
+            return false;
+        }
+        if (status.getCoverOpen() == Printer.TRUE) {
+            ShowMsg.showMsg("Printer cover is open", context);
+            return false;
+        }
+        return true;
     }
 
     private boolean isPrinterInitialized() {

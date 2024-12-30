@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.widget.Toast;
 
 import com.epson.epos2.Epos2Exception;
 import com.epson.epos2.Epos2CallbackCode;
@@ -47,23 +48,34 @@ public class ShowMsg {
     }
 
     private static void show(final String msg, final Context context) {
-        Activity activity = (Activity) context;
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                alertDialog.setMessage(msg);
-                alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        return;
-                    }
-                });
-                alertDialog.create();
-                alertDialog.show();
-            }
-        });
+        if (context instanceof Activity) {
+            // 如果是 Activity，正常显示对话框
+            Activity activity = (Activity) context;
+            new AlertDialog.Builder(activity)
+                    .setMessage(msg)
+                    .setPositiveButton("OK", null)
+                    .show();
+        } else {
+            // 如果是 ApplicationContext，可以考虑使用 Toast
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+        }
+//        Activity activity = (Activity) context;
+//
+//        activity.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+//                alertDialog.setMessage(msg);
+//                alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int whichButton) {
+//                        return;
+//                    }
+//                });
+//                alertDialog.create();
+//                alertDialog.show();
+//            }
+//        });
     }
 
     private static String getEposExceptionText(int state) {
