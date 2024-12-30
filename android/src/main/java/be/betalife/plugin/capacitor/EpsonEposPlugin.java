@@ -9,18 +9,33 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import com.epson.epos2.discovery.FilterOption;
 import com.epson.epos2.discovery.Discovery;
 
-import be.betalife.plugin.capacitor.PortDiscovery;
+import org.json.JSONObject;
 
 @CapacitorPlugin(name = "EpsonEpos")
 public class EpsonEposPlugin extends Plugin {
 
     private PortDiscovery portDiscovery;
+    private PrinterManager printerManager = new PrinterManager();
+
+    private PrinterUtils printerUtils;
+
+
+    @Override
+    public void handleOnDestroy() {
+        if (printerManager != null) {
+            printerManager.finalizePrinter();
+            printerManager = null;
+        }
+        super.handleOnDestroy();
+    }
 
     @Override
     public void load() {
@@ -107,4 +122,79 @@ public class EpsonEposPlugin extends Plugin {
             }
         });
     }
+
+    @PluginMethod
+    public void print(PluginCall call) {
+        String target = call.getString("target");
+        String printerModelCode = call.getString("modelCode");
+        String langCode = call.getString("langCode", "ANK"); // 默认端口类型为 "ANK"
+        JSArray jsArray = call.getArray("instructions"); // 获取 JSArray
+        List<HashMap<String, Object>> commands = new ArrayList<>();
+        try {
+            for (int i = 0; i < jsArray.length(); i++) {
+                JSONObject jsonObject = jsArray.getJSONObject(i);
+                HashMap<String, Object> command = new HashMap<>();
+
+                // Convert JSONObject to HashMap using keys() method
+                Iterator<String> keys = jsonObject.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    command.put(key, jsonObject.get(key));
+                }
+
+                commands.add(command);
+            }
+        } catch (Exception e) {
+            call.reject("Failed to parse instructions: " + e.getMessage());
+            return;
+        }
+
+        int lang = printerUtils.parsePrinterLang(langCode);
+        int printerSeries = printerUtils.parsePrinterSeries(printerModelCode);
+        // 初始化打印机
+        if (!printerManager.initializePrinter(printerSeries, lang, getContext())) {
+            call.reject("Failed to initialize printer");
+            return;
+        }
+
+        // 连接打印机
+        if (!printerManager.connectPrinter(target)) {
+            call.reject("Failed to connect to printer");
+            return;
+        }
+
+        // 执行打印逻辑
+        boolean success = printerManager.executePrintCommands(commands, getContext());
+        if (!success) {
+            call.reject("Failed to execute print commands");
+            return;
+        }
+
+        // 打印数据
+        printerManager.printData(new PrinterManager.PrinterCallback() {
+            @Override
+            public void onSuccess() {
+                call.resolve(new JSObject().put("success", true));
+            }
+
+            @Override
+            public void onError(String message) {
+                call.reject("Printing failed: " + message);
+            }
+        });
+
+        // 释放资源
+        printerManager.finalizePrinter();
+    }
+
+    @PluginMethod
+    public void finalizePrinter(PluginCall call) {
+        if (printerManager != null) {
+            printerManager.finalizePrinter();
+            call.resolve(new JSObject().put("message", "Printer finalized successfully"));
+        } else {
+            call.reject("PrinterManager is not initialized");
+        }
+    }
+
 }
