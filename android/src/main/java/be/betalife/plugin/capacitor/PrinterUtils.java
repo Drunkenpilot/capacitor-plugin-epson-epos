@@ -1,6 +1,14 @@
 package be.betalife.plugin.capacitor;
 
 import com.epson.epos2.printer.Printer;
+import com.getcapacitor.JSArray;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class PrinterUtils {
     public static int parsePrinterLang(String langCode) {
@@ -8,17 +16,17 @@ public class PrinterUtils {
             case "JAPANESE":
                 return Printer.LANG_JA;
             case "CHINESE_SC":
-                return  Printer.LANG_ZH_CN;
+                return Printer.LANG_ZH_CN;
             case "CHINESE_TC":
-                return  Printer.LANG_ZH_TW;
+                return Printer.LANG_ZH_TW;
             case "KOREAN":
-                return  Printer.LANG_KO;
+                return Printer.LANG_KO;
             case "THAI":
-                return  Printer.LANG_TH;
+                return Printer.LANG_TH;
             case "SOUTHASIA":
-                return  Printer.LANG_VI;
+                return Printer.LANG_VI;
             default:
-                return  Printer.LANG_EN;
+                return Printer.LANG_EN;
 
         }
     }
@@ -97,5 +105,22 @@ public class PrinterUtils {
                 // 如果输入型号不匹配，返回默认型号
                 return Printer.TM_M10;
         }
+    }
+
+    public List<HashMap<String, Object>> parseInstructions(JSArray jsArray) throws Exception {
+        List<HashMap<String, Object>> commands = new ArrayList<>();
+        for (int i = 0; i < jsArray.length(); i++) {
+            JSONObject jsonObject = jsArray.getJSONObject(i);
+            HashMap<String, Object> command = new HashMap<>();
+
+            Iterator<String> keys = jsonObject.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                command.put(key, jsonObject.get(key));
+            }
+
+            commands.add(command);
+        }
+        return commands;
     }
 }

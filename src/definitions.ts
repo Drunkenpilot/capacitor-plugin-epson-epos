@@ -71,7 +71,13 @@ export type EpsonEposPrinterSerie =
   | 'TM_U220II';
 
 export interface PrintOptions {
+  /**
+   * @requires
+   */
   target: string;
+  /**
+   * @requires
+   */
   instructions: PrintInstruction[];
   modelCode?: EpsonEposPrinterSerie;
   /**

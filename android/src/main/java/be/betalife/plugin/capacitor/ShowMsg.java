@@ -1,6 +1,5 @@
 package be.betalife.plugin.capacitor;
 
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -19,8 +18,7 @@ public class ShowMsg {
                     getEposExceptionText(((Epos2Exception) e).getErrorStatus()),
                     "Method",
                     method);
-        }
-        else {
+        } else {
             msg = e.toString();
         }
         show(msg, context);
@@ -31,15 +29,14 @@ public class ShowMsg {
         if (errMsg.isEmpty()) {
             msg = String.format(
                     "\t%s\n\t%s\n",
-                   "Result",
+                    "Result",
                     getCodeText(code));
-        }
-        else {
+        } else {
             msg = String.format(
                     "\t%s\n\t%s\n\n\t%s\n\t%s\n",
                     "Result",
                     getCodeText(code),
-                   "Description",
+                    "Description",
                     errMsg);
         }
         show(msg, context);
@@ -50,7 +47,7 @@ public class ShowMsg {
     }
 
     private static void show(final String msg, final Context context) {
-        Activity activity = (Activity)context;
+        Activity activity = (Activity) context;
 
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -60,7 +57,7 @@ public class ShowMsg {
                 alertDialog.setMessage(msg);
                 alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        return ;
+                        return;
                     }
                 });
                 alertDialog.create();
@@ -72,52 +69,52 @@ public class ShowMsg {
     private static String getEposExceptionText(int state) {
         String return_text = "";
         switch (state) {
-            case    Epos2Exception.ERR_PARAM:
+            case Epos2Exception.ERR_PARAM:
                 return_text = "ERR_PARAM";
                 break;
-            case    Epos2Exception.ERR_CONNECT:
+            case Epos2Exception.ERR_CONNECT:
                 return_text = "ERR_CONNECT";
                 break;
-            case    Epos2Exception.ERR_TIMEOUT:
+            case Epos2Exception.ERR_TIMEOUT:
                 return_text = "ERR_TIMEOUT";
                 break;
-            case    Epos2Exception.ERR_MEMORY:
+            case Epos2Exception.ERR_MEMORY:
                 return_text = "ERR_MEMORY";
                 break;
-            case    Epos2Exception.ERR_ILLEGAL:
+            case Epos2Exception.ERR_ILLEGAL:
                 return_text = "ERR_ILLEGAL";
                 break;
-            case    Epos2Exception.ERR_PROCESSING:
+            case Epos2Exception.ERR_PROCESSING:
                 return_text = "ERR_PROCESSING";
                 break;
-            case    Epos2Exception.ERR_NOT_FOUND:
+            case Epos2Exception.ERR_NOT_FOUND:
                 return_text = "ERR_NOT_FOUND";
                 break;
-            case    Epos2Exception.ERR_IN_USE:
+            case Epos2Exception.ERR_IN_USE:
                 return_text = "ERR_IN_USE";
                 break;
-            case    Epos2Exception.ERR_TYPE_INVALID:
+            case Epos2Exception.ERR_TYPE_INVALID:
                 return_text = "ERR_TYPE_INVALID";
                 break;
-            case    Epos2Exception.ERR_DISCONNECT:
+            case Epos2Exception.ERR_DISCONNECT:
                 return_text = "ERR_DISCONNECT";
                 break;
-            case    Epos2Exception.ERR_ALREADY_OPENED:
+            case Epos2Exception.ERR_ALREADY_OPENED:
                 return_text = "ERR_ALREADY_OPENED";
                 break;
-            case    Epos2Exception.ERR_ALREADY_USED:
+            case Epos2Exception.ERR_ALREADY_USED:
                 return_text = "ERR_ALREADY_USED";
                 break;
-            case    Epos2Exception.ERR_BOX_COUNT_OVER:
+            case Epos2Exception.ERR_BOX_COUNT_OVER:
                 return_text = "ERR_BOX_COUNT_OVER";
                 break;
-            case    Epos2Exception.ERR_BOX_CLIENT_OVER:
+            case Epos2Exception.ERR_BOX_CLIENT_OVER:
                 return_text = "ERR_BOX_CLIENT_OVER";
                 break;
-            case    Epos2Exception.ERR_UNSUPPORTED:
+            case Epos2Exception.ERR_UNSUPPORTED:
                 return_text = "ERR_UNSUPPORTED";
                 break;
-            case    Epos2Exception.ERR_FAILURE:
+            case Epos2Exception.ERR_FAILURE:
                 return_text = "ERR_FAILURE";
                 break;
             default:

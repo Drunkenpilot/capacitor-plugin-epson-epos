@@ -1,6 +1,8 @@
 package be.betalife.plugin.capacitor;
 
+import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.JSArray;
@@ -21,31 +23,41 @@ import org.json.JSONObject;
 
 @CapacitorPlugin(name = "EpsonEpos")
 public class EpsonEposPlugin extends Plugin {
+    private Activity activity; // 保存 Activity 实例
+    private static final String TAG = "EpsonEposPlugin";
 
     private PortDiscovery portDiscovery;
-    private PrinterManager printerManager = new PrinterManager();
+    private PrinterManager printerManager;
 
     private PrinterUtils printerUtils;
 
-
-    @Override
-    public void handleOnDestroy() {
-        if (printerManager != null) {
-            printerManager.finalizePrinter();
-            printerManager = null;
-        }
-        super.handleOnDestroy();
-    }
+    // @Override
+    // public void handleOnDestroy() {
+    // if (printerManager == null) {
+    // call.reject("PrinterManager is not initialized");
+    // return;
+    // }
+    // if (printerManager != null) {
+    // printerManager.finalizePrinter();
+    // printerManager = null;
+    // }
+    // super.handleOnDestroy();
+    // }
 
     @Override
     public void load() {
         super.load();
         Context context = getContext();
         portDiscovery = new PortDiscovery(context);
+        activity = getActivity();
+        printerManager = new PrinterManager(activity);
+        printerUtils = new PrinterUtils();
     }
 
     @PluginMethod
     public void startDiscovery(PluginCall call) {
+        Log.d(TAG, "startDiscovery called");
+
         long timeout = call.getLong("timeout", 10000L); // 默认超时时间为10秒
         String portType = call.getString("portType", "ALL"); // 默认端口类型为 "ALL"
         FilterOption filterOption = new FilterOption();
@@ -129,21 +141,24 @@ public class EpsonEposPlugin extends Plugin {
         String printerModelCode = call.getString("modelCode");
         String langCode = call.getString("langCode", "ANK"); // 默认端口类型为 "ANK"
         JSArray jsArray = call.getArray("instructions"); // 获取 JSArray
-        List<HashMap<String, Object>> commands = new ArrayList<>();
+        // List<HashMap<String, Object>> commands = new ArrayList<>();
+        // for (int i = 0; i < jsArray.length(); i++) {
+        // JSONObject jsonObject = jsArray.getJSONObject(i);
+        // HashMap<String, Object> command = new HashMap<>();
+        //
+        // // Convert JSONObject to HashMap using keys() method
+        // Iterator<String> keys = jsonObject.keys();
+        // while (keys.hasNext()) {
+        // String key = keys.next();
+        // command.put(key, jsonObject.get(key));
+        // }
+        //
+        // commands.add(command);
+        // }
+
+        List<HashMap<String, Object>> commands;
         try {
-            for (int i = 0; i < jsArray.length(); i++) {
-                JSONObject jsonObject = jsArray.getJSONObject(i);
-                HashMap<String, Object> command = new HashMap<>();
-
-                // Convert JSONObject to HashMap using keys() method
-                Iterator<String> keys = jsonObject.keys();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    command.put(key, jsonObject.get(key));
-                }
-
-                commands.add(command);
-            }
+            commands = printerUtils.parseInstructions(jsArray);
         } catch (Exception e) {
             call.reject("Failed to parse instructions: " + e.getMessage());
             return;
@@ -158,7 +173,7 @@ public class EpsonEposPlugin extends Plugin {
         }
 
         // 连接打印机
-        if (!printerManager.connectPrinter(target)) {
+        if (!printerManager.connectPrinter(target, getContext())) {
             call.reject("Failed to connect to printer");
             return;
         }
@@ -174,17 +189,18 @@ public class EpsonEposPlugin extends Plugin {
         printerManager.printData(new PrinterManager.PrinterCallback() {
             @Override
             public void onSuccess() {
-                call.resolve(new JSObject().put("success", true));
+                activity.runOnUiThread(() -> {
+                    call.resolve(new JSObject().put("success", true));
+                });
             }
 
             @Override
             public void onError(String message) {
+                printerManager.finalizePrinter();
                 call.reject("Printing failed: " + message);
             }
         });
 
-        // 释放资源
-        printerManager.finalizePrinter();
     }
 
     @PluginMethod
