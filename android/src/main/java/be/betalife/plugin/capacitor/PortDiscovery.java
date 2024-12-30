@@ -1,4 +1,4 @@
-package com.epson.epos2_discovery;
+package be.betalife.plugin.capacitor;
 
 import android.content.Context;
 import android.os.Handler;

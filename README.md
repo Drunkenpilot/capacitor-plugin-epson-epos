@@ -2,6 +2,8 @@
 
 A capacitorjs plugin for Epson Pos Printer
 
+Under development
+
 ## Install
 
 ```bash
@@ -13,25 +15,57 @@ npx cap sync
 
 <docgen-index>
 
-* [`echo(...)`](#echo)
+* [`startDiscovery(...)`](#startdiscovery)
+* [`stopDiscovery()`](#stopdiscovery)
+* [Interfaces](#interfaces)
 
 </docgen-index>
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### echo(...)
+### startDiscovery(...)
 
 ```typescript
-echo(options: { value: string; }) => Promise<{ value: string; }>
+startDiscovery(options: StartDiscoveryOptions) => Promise<DiscoveryResult>
 ```
 
-| Param         | Type                            |
-| ------------- | ------------------------------- |
-| **`options`** | <code>{ value: string; }</code> |
+| Param         | Type                                                                    |
+| ------------- | ----------------------------------------------------------------------- |
+| **`options`** | <code><a href="#startdiscoveryoptions">StartDiscoveryOptions</a></code> |
 
-**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#discoveryresult">DiscoveryResult</a>&gt;</code>
 
 --------------------
+
+
+### stopDiscovery()
+
+```typescript
+stopDiscovery() => Promise<{ message: string; }>
+```
+
+**Returns:** <code>Promise&lt;{ message: string; }&gt;</code>
+
+--------------------
+
+
+### Interfaces
+
+
+#### DiscoveryResult
+
+| Prop           | Type                                                    |
+| -------------- | ------------------------------------------------------- |
+| **`printers`** | <code>{ PrinterName: string; Target: string; }[]</code> |
+
+
+#### StartDiscoveryOptions
+
+| Prop            | Type                                                |
+| --------------- | --------------------------------------------------- |
+| **`timeout`**   | <code>number</code>                                 |
+| **`broadcast`** | <code>string</code>                                 |
+| **`portType`**  | <code>'ALL' \| 'TCP' \| 'BLUETOOTH' \| 'USB'</code> |
 
 </docgen-api>
