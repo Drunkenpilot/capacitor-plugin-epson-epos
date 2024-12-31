@@ -31,19 +31,6 @@ public class EpsonEposPlugin extends Plugin {
 
     private PrinterUtils printerUtils;
 
-    // @Override
-    // public void handleOnDestroy() {
-    // if (printerManager == null) {
-    // call.reject("PrinterManager is not initialized");
-    // return;
-    // }
-    // if (printerManager != null) {
-    // printerManager.finalizePrinter();
-    // printerManager = null;
-    // }
-    // super.handleOnDestroy();
-    // }
-
     @Override
     public void load() {
         super.load();
@@ -141,20 +128,6 @@ public class EpsonEposPlugin extends Plugin {
         String printerModelCode = call.getString("modelCode");
         String langCode = call.getString("langCode", "ANK"); // 默认端口类型为 "ANK"
         JSArray jsArray = call.getArray("instructions"); // 获取 JSArray
-        // List<HashMap<String, Object>> commands = new ArrayList<>();
-        // for (int i = 0; i < jsArray.length(); i++) {
-        // JSONObject jsonObject = jsArray.getJSONObject(i);
-        // HashMap<String, Object> command = new HashMap<>();
-        //
-        // // Convert JSONObject to HashMap using keys() method
-        // Iterator<String> keys = jsonObject.keys();
-        // while (keys.hasNext()) {
-        // String key = keys.next();
-        // command.put(key, jsonObject.get(key));
-        // }
-        //
-        // commands.add(command);
-        // }
 
         List<HashMap<String, Object>> commands;
         try {

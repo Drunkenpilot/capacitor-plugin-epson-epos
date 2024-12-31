@@ -118,10 +118,81 @@ finalizePrinter() => Promise<{ message: string; }>
 
 #### PrintInstruction
 
-| Prop         | Type                |
-| ------------ | ------------------- |
-| **`method`** | <code>string</code> |
-| **`value`**  | <code>any</code>    |
+| Prop                  | Type                                                            |
+| --------------------- | --------------------------------------------------------------- |
+| **`addHPosition`**    | <code>number</code>                                             |
+| **`addLineSpace`**    | <code>number</code>                                             |
+| **`addFeedLine`**     | <code>number</code>                                             |
+| **`addFeedUnit`**     | <code>number</code>                                             |
+| **`addTextAlign`**    | <code><a href="#printtextalign">PrintTextAlign</a></code>       |
+| **`addText`**         | <code><a href="#printtext">PrintText</a></code>                 |
+| **`addTextStyle`**    | <code><a href="#printtextstyle">PrintTextStyle</a></code>       |
+| **`addBase64Image`**  | <code><a href="#printbase64image">PrintBase64Image</a></code>   |
+| **`addBarcode`**      | <code><a href="#printbarcode">PrintBarcode</a></code>           |
+| **`addTextSize`**     | <code>[number, number]</code>                                   |
+| **`addCut`**          | <code><a href="#printcut">PrintCut</a></code>                   |
+| **`addPulse`**        | <code><a href="#printwithpulse">PrintWithPulse</a></code>       |
+| **`addCommand`**      | <code>BinaryType</code>                                         |
+| **`addFeedPosition`** | <code><a href="#printfeedposition">PrintFeedPosition</a></code> |
+| **`addLayout`**       | <code><a href="#printlayout">PrintLayout</a></code>             |
+
+
+#### PrintText
+
+| Prop        | Type                                                      |
+| ----------- | --------------------------------------------------------- |
+| **`value`** | <code>string</code>                                       |
+| **`size`**  | <code>[number, number]</code>                             |
+| **`align`** | <code><a href="#printtextalign">PrintTextAlign</a></code> |
+| **`style`** | <code><a href="#printtextstyle">PrintTextStyle</a></code> |
+
+
+#### PrintTextStyle
+
+| Prop          | Type                 | Description   |
+| ------------- | -------------------- | ------------- |
+| **`reverse`** | <code>boolean</code> | default false |
+| **`ul`**      | <code>boolean</code> | default false |
+| **`em`**      | <code>boolean</code> | default false |
+
+
+#### PrintBase64Image
+
+| Prop         | Type                | Description               |
+| ------------ | ------------------- | ------------------------- |
+| **`value`**  | <code>string</code> | value Base64 image string |
+| **`x`**      | <code>number</code> |                           |
+| **`y`**      | <code>number</code> |                           |
+| **`width`**  | <code>number</code> |                           |
+| **`height`** | <code>number</code> |                           |
+
+
+#### PrintBarcode
+
+| Prop        | Type                |
+| ----------- | ------------------- |
+| **`value`** | <code>string</code> |
+
+
+#### PrintWithPulse
+
+| Prop         | Type                                            | Default           |
+| ------------ | ----------------------------------------------- | ----------------- |
+| **`drawer`** | <code><a href="#drawerpin">DrawerPin</a></code> | <code>2pin</code> |
+| **`time`**   | <code><a href="#pulsetime">PulseTime</a></code> | <code>100</code>  |
+
+
+#### PrintLayout
+
+| Prop               | Type                                                        |
+| ------------------ | ----------------------------------------------------------- |
+| **`type`**         | <code><a href="#printlayouttype">PrintLayoutType</a></code> |
+| **`width`**        | <code>number</code>                                         |
+| **`height`**       | <code>number</code>                                         |
+| **`marginTop`**    | <code>number</code>                                         |
+| **`marginBottom`** | <code>number</code>                                         |
+| **`offsetCut`**    | <code>number</code>                                         |
+| **`offsetLabel`**  | <code>number</code>                                         |
 
 
 ### Type Aliases
@@ -130,6 +201,36 @@ finalizePrinter() => Promise<{ message: string; }>
 #### EpsonEposPortType
 
 <code>'ALL' | 'TCP' | 'BLUETOOTH' | 'USB'</code>
+
+
+#### PrintTextAlign
+
+<code>'left' | 'right' | 'center'</code>
+
+
+#### PrintCut
+
+<code>'cut_feed' | 'cut_no_feed' | 'cut_reserve' | 'full_cut_feed' | 'full_cut_no_feed' | 'full_cut_reserve'</code>
+
+
+#### DrawerPin
+
+<code>'2pin' | '5pin'</code>
+
+
+#### PulseTime
+
+<code>'pulse_100' | 'pulse_200' | 'pulse_300' | 'pulse_300' | 'pulse_400' | 'pulse_500'</code>
+
+
+#### PrintFeedPosition
+
+<code>'peeling' | 'cutting' | 'current_tof' | 'next_tof'</code>
+
+
+#### PrintLayoutType
+
+<code>'receipt' | 'receipt_bm' | 'label' | 'label_bm'</code>
 
 
 #### EpsonEposPrinterSerie

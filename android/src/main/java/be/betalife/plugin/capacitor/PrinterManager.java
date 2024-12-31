@@ -2,8 +2,11 @@ package be.betalife.plugin.capacitor;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Base64;
 import android.util.Log;
 
 import com.epson.epos2.Epos2Exception;
@@ -15,13 +18,14 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PrinterManager implements ReceiveListener {
-    private Activity activity; // 保存 Activity 实例
+
     private Handler uiHandler = new Handler(Looper.getMainLooper());
     private Context context;
+    private PrinterUtils printerUtils;
 
     public PrinterManager(Activity activity) {
-        this.activity = activity;
         this.context = activity.getApplicationContext();
+        this.printerUtils = new PrinterUtils();
     }
 
     private Printer mPrinter = null;
@@ -69,53 +73,193 @@ public class PrinterManager implements ReceiveListener {
             return false;
         }
 
-        String methodName = "";
-
         try {
             for (HashMap<String, Object> command : commands) {
-                methodName = (String) command.get("method");
-                Object value = command.get("value");
+                for (String key : command.keySet()) {
+                    Object value = command.get(key);
 
-                switch (methodName) {
-                    case "addFeedLine":
-                        if (value instanceof Integer) {
-                            mPrinter.addFeedLine((int) value);
-                        } else {
-                            throw new IllegalArgumentException("Invalid value for addFeedLine");
-                        }
-                        break;
-                    case "addTextAlign":
-                        if (value instanceof Integer) {
-                            mPrinter.addTextAlign((int) value);
-                        } else {
-                            throw new IllegalArgumentException("Invalid value for addTextAlign");
-                        }
-                        break;
-                    case "addText":
-                        if (value instanceof String) {
-                            mPrinter.addText((String) value);
-                        } else {
-                            throw new IllegalArgumentException("Invalid value for addText");
-                        }
-                        break;
-                    case "addBarcode":
-                        mPrinter.addBarcode((String) value, Printer.BARCODE_CODE39, Printer.HRI_BELOW,
-                                Printer.FONT_A, 2, 100);
-                        break;
-                    case "addTextSize":
-                        if (value instanceof int[] && ((int[]) value).length == 2) {
-                            int[] size = (int[]) value;
-                            mPrinter.addTextSize(size[0], size[1]);
-                        } else {
-                            throw new IllegalArgumentException("Invalid value for addTextSize");
-                        }
-                        break;
-                    case "addCut":
-                        mPrinter.addCut(Printer.CUT_FEED);
-                        break;
-                    default:
-                        ShowMsg.showMsg("Unsupported method: " + methodName, context);
-                        return false;
+                    switch (key) {
+                        case "addHPosition":
+                            if (value instanceof Integer) {
+                                mPrinter.addHPosition((int) value);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addHPosition");
+                            }
+                            break;
+
+                        case "addLineSpace":
+                            if (value instanceof Integer) {
+                                mPrinter.addLineSpace((int) value);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addLineSpace");
+                            }
+                            break;
+
+                        case "addFeedLine":
+                            if (value instanceof Integer) {
+                                mPrinter.addFeedLine((int) value);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addFeedLine");
+                            }
+                            break;
+
+                        case "addFeedUnit":
+                            if (value instanceof Integer) {
+                                mPrinter.addFeedUnit((int) value);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addFeedUnit");
+                            }
+                            break;
+
+                        case "addTextAlign":
+                            if (value instanceof String) {
+                                int alignment = printerUtils.parseTextAlign((String) value);
+                                mPrinter.addTextAlign(alignment);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addTextAlign");
+                            }
+                            break;
+
+                        case "addText":
+                            if (value instanceof String) {
+                                mPrinter.addText((String) value);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addTextAlign");
+                            }
+                            break;
+
+                        case "addTextStyle":
+                            if (value instanceof HashMap) {
+                                HashMap<String, Boolean> styleParams = (HashMap<String, Boolean>) value;
+                                boolean reverse = printerUtils.getOrDefault(styleParams, "reverse", false);
+                                boolean ul = printerUtils.getOrDefault(styleParams, "ul", false);
+                                boolean em = printerUtils.getOrDefault(styleParams, "em", false);
+                                mPrinter.addTextStyle(
+                                        reverse ? Printer.TRUE : Printer.FALSE,
+                                        ul ? Printer.TRUE : Printer.FALSE,
+                                        em ? Printer.TRUE : Printer.FALSE,
+                                        Printer.COLOR_1);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addTextStyle");
+                            }
+                            break;
+
+                        case "addBase64Image":
+                            if (value instanceof HashMap) {
+                                HashMap<String, Object> imageParams = (HashMap<String, Object>) value;
+                                String base64 = (String) imageParams.get("value");
+                                int x = (int) printerUtils.getOrDefault(imageParams, "x", 0);
+                                int y = (int) printerUtils.getOrDefault(imageParams, "y", 0);
+                                int width = (int) printerUtils.getOrDefault(imageParams, "width", 0);
+                                int height = (int) printerUtils.getOrDefault(imageParams, "height", 0);
+                                byte[] imageBytes = Base64.decode(base64, Base64.DEFAULT);
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                                mPrinter.addImage(
+                                        bitmap,
+                                        x,
+                                        y,
+                                        width > 0 ? width : bitmap.getWidth(),
+                                        height > 0 ? height : bitmap.getHeight(),
+                                        Printer.COLOR_1,
+                                        Printer.MODE_MONO,
+                                        Printer.HALFTONE_DITHER,
+                                        Printer.PARAM_DEFAULT,
+                                        Printer.COMPRESS_AUTO);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addBase64Image");
+                            }
+                            break;
+
+                        case "addBarcode":
+                            if (value instanceof HashMap) {
+                                HashMap<String, Object> barcodeParams = (HashMap<String, Object>) value;
+                                String barcodeValue = (String) barcodeParams.get("value");
+                                mPrinter.addBarcode(
+                                        barcodeValue,
+                                        Printer.BARCODE_CODE39,
+                                        Printer.HRI_BELOW,
+                                        Printer.FONT_A,
+                                        2,
+                                        100);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addBarcode");
+                            }
+                            break;
+
+                        case "addTextSize":
+                            if (value instanceof int[] && ((int[]) value).length == 2) {
+                                int[] size = (int[]) value;
+                                mPrinter.addTextSize(size[0], size[1]);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addTextSize");
+                            }
+                            break;
+
+                        case "addCut":
+                            if (value instanceof String) {
+                                int cutType = printerUtils.parseCutType((String) value);
+                                mPrinter.addCut(cutType);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addCut");
+                            }
+                            break;
+
+                        case "addPulse":
+                            if (value instanceof HashMap) {
+                                HashMap<String, Object> pulseParams = (HashMap<String, Object>) value;
+                                String drawer = (String) pulseParams.get("drawer");
+                                String time = (String) pulseParams.get("time");
+                                mPrinter.addPulse(
+                                        printerUtils.parseDrawerPin(drawer),
+                                        printerUtils.parsePulseTime(time));
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addPulse");
+                            }
+                            break;
+
+                        case "addFeedPosition":
+                            if (value instanceof String) {
+                                int feedPosition = printerUtils.parseFeedPosition((String) value);
+                                mPrinter.addFeedPosition(feedPosition);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addFeedPosition");
+                            }
+                            break;
+
+                        case "addLayout":
+                            if (value instanceof HashMap) {
+                                HashMap<String, Object> layoutParams = (HashMap<String, Object>) value;
+                                int layoutType = printerUtils.parseLayoutType((String) layoutParams.get("type"));
+                                int width = (int) layoutParams.get("width");
+                                int height = (int) layoutParams.get("height");
+                                int marginTop = (int) layoutParams.get("marginTop");
+                                int marginBottom = (int) layoutParams.get("marginBottom");
+                                int offsetCut = (int) layoutParams.get("offsetCut");
+                                int offsetLabel = (int) layoutParams.get("offsetLabel");
+                                mPrinter.addLayout(
+                                        layoutType,
+                                        width,
+                                        height,
+                                        marginTop,
+                                        marginBottom,
+                                        offsetCut,
+                                        offsetLabel);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addLayout");
+                            }
+                            break;
+
+                        case "addCommand":
+                            if (value instanceof byte[]) {
+                                mPrinter.addCommand((byte[]) value);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addCommand");
+                            }
+                            break;
+
+                        default:
+                            throw new IllegalArgumentException("Unsupported method: " + key);
+                    }
                 }
             }
             return true;

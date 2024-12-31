@@ -71,13 +71,7 @@ export type EpsonEposPrinterSerie =
   | 'TM_U220II';
 
 export interface PrintOptions {
-  /**
-   * @requires
-   */
   target: string;
-  /**
-   * @requires
-   */
   instructions: PrintInstruction[];
   modelCode?: EpsonEposPrinterSerie;
   /**
@@ -87,6 +81,197 @@ export interface PrintOptions {
 }
 
 export interface PrintInstruction {
-  method: string;
-  value?: any;
+  /**
+   * @description Specifies the horizontal print start position in dots.
+   * @description Horizontal print start position (in dots )
+   * @value Integer from 0 to 65535
+   */
+  addHPosition?: number;
+  /**
+   * @value Integer from 0 to 255
+   * @description Line spacing (in dots)
+   */
+  addLineSpace?: number;
+  /**
+   * @value Integer from 0 to 255
+   * @description Specifies the paper feed amount (in lines).
+   * @description Paper feed amount (in lines)
+   */
+  addFeedLine?: number;
+  /**
+   * @value Integer from 0 to 255
+   * @description Specifies the paper feed amount (in dots).
+   * @description Paper feed amount (in dots)
+   */
+  addFeedUnit?: number;
+  addTextAlign?: PrintTextAlign;
+  addText?: PrintText;
+  addTextStyle?: PrintTextStyle;
+  addBase64Image?: PrintBase64Image;
+  addBarcode?: PrintBarcode;
+  /**
+   * @value Integer from 1 to 8
+   */
+  addTextSize?: [number, number];
+  /**
+   * @description Adds a sheet cut command to the command buffer.
+   * @description Specifies how to cut paper.
+   */
+  addCut?: PrintCut;
+  /**
+   * @description Specifies the drawer kick connector.
+   * @description The drawer and optional external buzzer cannot be connected simultaneously.
+   */
+  addPulse?: PrintWithPulse;
+
+  /**
+   * @description Specifies the ESC/POS command.
+   * @description Specifies the binary data.
+   */
+  addCommand?: BinaryType;
+  /**
+   * @description Adds a label sheet/black mark sheet feed command to the command buffer.
+   */
+  addFeedPosition?: PrintFeedPosition;
+  /**
+   * @description Adds layout setting of the label sheet/black mark sheet to the command buffer.
+   */
+  addLayout?: PrintLayout;
+}
+
+// method: PrintInstructionMethod;
+// value?: any;
+
+export interface PrintTextStyle {
+  /**
+   * default false
+   */
+  reverse?: boolean;
+  /**
+   * default false
+   */
+  ul?: boolean;
+  /**
+   * default false
+   */
+  em?: boolean;
+}
+
+export interface PrintText {
+  value: string;
+  size?: [number, number];
+  align?: PrintTextAlign;
+  style?: PrintTextStyle;
+}
+
+export interface PrintBarcode {
+  value: string;
+}
+
+export interface PrintLayout {
+  type: PrintLayoutType;
+  /**
+   * @description Specifies the paper width (in 0.1 mm units).
+   * @value TM Printer Models Integer from 1 to 10000
+   * @value POS Terminal Model Integer from 290 to 600
+   */
+  width: number;
+  /**
+   * @description Specifies the distance from the print reference mark to the next print reference mark (in 0.1mm units).
+   * @value Receipt (without black mark) 0
+   * @value TM Printer Models Integer from 1 to 10000
+   * @value POS Terminal Model Integer from 0 to 1550
+   */
+  height: number;
+  /**
+   * @description Specifies the distance from the print reference mark to the top of the sheet (in 0.1mm units).
+   * @value Receipt (without black mark) 0
+   * @value TM Printer Models Receipt (with black mark) Integer from -9999 to 10000
+   * @value TM Printer Models Label (without black mark) Integer from 0 to 10000
+   * @value TM Printer Models Label (with black mark) Integer from -9999 to 10000
+   * @value POS Terminal Model Receipt (with black mark) Integer from -150 to 1500
+   * @value POS Terminal Model Label (without black mark) Integer from 0 to 1500
+   * @value POS Terminal Model Label (with black mark) Integer from -15 to 1500
+   */
+  marginTop: number;
+  /**
+   * @description Specifies the distance from the eject reference mark to the bottom edge of the printable area (in 0.1mm units).
+   * @value Receipt (with / without black mark) 0
+   * @value TM Printer Models Label (without black mark) Integer from -9999 to 0
+   * @value TM Printer Models Label (with black mark) Integer from -9999 to 10000
+   * @value POS Terminal Model Label (without black mark) Integer from -15 to 0
+   * @value POS Terminal Model Label (with black mark) Integer from -15 to 15
+   */
+  marginBottom: number;
+  /**
+   * @description Specifies the distance from the eject reference mark to the cut position (in 0.1mm units).
+   * @value Receipt (without black mark) 0
+   * @value TM Printer Models Receipt (with black mark) Integer from -9999 to 10000
+   * @value TM Printer Models Label (without black mark) Integer from 0 to 10000
+   * @value TM Printer Models Label (with black mark) Integer from 0 to 10000
+   * @value POS Terminal Model Receipt (with black mark) Integer from -290 to 50
+   * @value POS Terminal Model Label (without black mark) Integer from 0 to 50
+   * @value POS Terminal Model Label (with black mark) Integer from 0 to 50
+   */
+  offsetCut: number;
+  /**
+   * @description Specifies the distance from the eject reference mark to the bottom edge of the label (in 0.1mm units).
+   * @value Receipt (with without black mark) 0
+   * @value TM Printer Models Label (without black mark) 0
+   * @value TM Printer Models Label (with black mark) Integer from 0 to 10000
+   * @value POS Terminal Model Label (without black mark) 0
+   * @value POS Terminal Model Label (with black mark) Integer from 0 to 15
+   */
+  offsetLabel: number;
+}
+
+export interface PrintWithPulse {
+  /**
+   * @default 2pin
+   */
+  drawer?: DrawerPin;
+  /**
+   * @default 100
+   */
+  time?: PulseTime;
+}
+
+export type PrintTextAlign = 'left' | 'right' | 'center';
+
+export type PrintLayoutType = 'receipt' | 'receipt_bm' | 'label' | 'label_bm';
+
+export type PrintFeedPosition = 'peeling' | 'cutting' | 'current_tof' | 'next_tof';
+
+export type PrintCut =
+  | 'cut_feed'
+  | 'cut_no_feed'
+  | 'cut_reserve'
+  | 'full_cut_feed'
+  | 'full_cut_no_feed'
+  | 'full_cut_reserve';
+
+export type DrawerPin = '2pin' | '5pin';
+export type PulseTime = 'pulse_100' | 'pulse_200' | 'pulse_300' | 'pulse_300' | 'pulse_400' | 'pulse_500';
+
+export interface PrintBase64Image {
+  /**
+   * value Base64 image string
+   */
+  value: string;
+  /**
+   * @description Specifies the horizontal start position of the print area (in pixels).
+   */
+  x?: number;
+  /**
+   * @description Specifies the vertical start position of the print area (in pixels).
+   */
+  y?: number;
+  /**
+   * @description Specifies the width of the print area (in pixels).
+   */
+  width?: number;
+  /**
+   * @description Specifies the height of the print area (in pixels).
+   */
+  height?: number;
 }
