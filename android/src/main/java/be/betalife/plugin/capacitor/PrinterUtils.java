@@ -192,6 +192,25 @@ public class PrinterUtils {
         }
     }
 
+    public static int parseLineStyle(String lineStyle) {
+        switch (lineStyle) {
+            case "thin":
+                return Printer.LINE_THIN;
+            case "medium":
+                return Printer.LINE_MEDIUM;
+            case "thick":
+                return Printer.LINE_THICK;
+            case "thin_double":
+                return Printer.LINE_THIN_DOUBLE;
+            case "medium_double":
+                return Printer.LINE_MEDIUM_DOUBLE;
+            case "thick_double":
+                return Printer.LINE_THICK_DOUBLE;
+            default:
+                return Printer.LINE_THIN;
+        }
+    }
+
     public static <K, V> V getOrDefault(Map<K, V> map, K key, V defaultValue) {
         return map.containsKey(key) ? map.get(key) : defaultValue;
     }
@@ -266,6 +285,13 @@ public class PrinterUtils {
                 imageCommand.put("width", imageObject.optInt("width", 0));
                 imageCommand.put("height", imageObject.optInt("height", 0));
                 command.put("addBase64Image", imageCommand);
+            }
+            if (jsonObject.has("addHLine")) {
+                command.put("addHLine", jsonObject.getJSONObject("addHLine")); // Store as JSONObject for further parsing
+            }
+            if (jsonObject.has("addVLineBegin") && jsonObject.has("addVLineEnd")) {
+                command.put("addVLineBegin", jsonObject.getJSONObject("addVLineBegin")); // Store as JSONObject for further parsing
+                command.put("addVLineEnd", jsonObject.getJSONObject("addVLineEnd")); // Store as JSONObject for further parsing
             }
             if (jsonObject.has("addBarcode")) {
                 JSONObject barcodeObject = jsonObject.getJSONObject("addBarcode");

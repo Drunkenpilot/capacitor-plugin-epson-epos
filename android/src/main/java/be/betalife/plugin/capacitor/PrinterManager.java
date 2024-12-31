@@ -14,6 +14,10 @@ import com.epson.epos2.printer.Printer;
 import com.epson.epos2.printer.PrinterStatusInfo;
 import com.epson.epos2.printer.ReceiveListener;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -154,6 +158,13 @@ public class PrinterManager implements ReceiveListener {
                                 int height = (int) printerUtils.getOrDefault(imageParams, "height", 0);
                                 byte[] imageBytes = Base64.decode(base64, Base64.DEFAULT);
                                 Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+
+                                if(width> 0 &&  bitmap.getWidth() > width) {
+                                    bitmap = Bitmap.createScaledBitmap(bitmap, width, (bitmap.getHeight() * width) / bitmap.getWidth(), false);
+                                    log("Scaled Image Width: "+bitmap.getWidth());
+                                    log("Scaled Image Height: "+bitmap.getHeight());
+                                }
+
                                 mPrinter.addImage(
                                         bitmap,
                                         x,
@@ -169,6 +180,52 @@ public class PrinterManager implements ReceiveListener {
                                 throw new IllegalArgumentException("Invalid value for addBase64Image");
                             }
                             break;
+
+                        case "addHLine":
+                            if (value instanceof JSONObject) {
+                                JSONObject hLine = (JSONObject) value;
+                                JSONArray position = hLine.getJSONArray("position");
+
+                                int x1 = position.getInt(0);
+                                int x2 = position.getInt(1);
+                                String lineStyle = hLine.getString("lineStyle");
+                                mPrinter.addHLine(x1, x2, printerUtils.parseLineStyle(lineStyle));
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addHLine");
+                            }
+                            break;
+
+                        case "addVLineBegin":
+                            if (value instanceof JSONObject) {
+                                JSONObject vLine = (JSONObject) value;
+                                int position = vLine.getInt("position");
+                                String lineStyle = vLine.getString("lineStyle");
+                                JSONArray lineIds = vLine.getJSONArray("lineId");
+
+                                int[] ids = new int[lineIds.length()];
+                                for (int i = 0; i < lineIds.length(); i++) {
+                                    int lineId = lineIds.getInt(i);
+                                    ids[i]=lineId;
+                                }
+                                mPrinter.addVLineBegin(position, printerUtils.parseLineStyle(lineStyle), ids);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addVLineBegin");
+                            }
+                            break;
+
+                        case "addVLineEnd":
+                            if (value instanceof JSONObject) {
+                                JSONObject vLineEnd = (JSONObject) value;
+                                JSONArray lineIds = vLineEnd.getJSONArray("lineId");
+                                for (int i = 0; i < lineIds.length(); i++) {
+                                    int lineId = lineIds.getInt(i);
+                                    mPrinter.addVLineEnd(lineId);
+                                }
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addVLineEnd");
+                            }
+                            break;
+
 
                         case "addBarcode":
                             if (value instanceof HashMap) {

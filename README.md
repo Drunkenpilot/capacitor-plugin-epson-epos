@@ -118,23 +118,26 @@ finalizePrinter() => Promise<{ message: string; }>
 
 #### PrintInstruction
 
-| Prop                  | Type                                                            |
-| --------------------- | --------------------------------------------------------------- |
-| **`addHPosition`**    | <code>number</code>                                             |
-| **`addLineSpace`**    | <code>number</code>                                             |
-| **`addFeedLine`**     | <code>number</code>                                             |
-| **`addFeedUnit`**     | <code>number</code>                                             |
-| **`addTextAlign`**    | <code><a href="#printtextalign">PrintTextAlign</a></code>       |
-| **`addText`**         | <code><a href="#printtext">PrintText</a></code>                 |
-| **`addTextStyle`**    | <code><a href="#printtextstyle">PrintTextStyle</a></code>       |
-| **`addBase64Image`**  | <code><a href="#printbase64image">PrintBase64Image</a></code>   |
-| **`addBarcode`**      | <code><a href="#printbarcode">PrintBarcode</a></code>           |
-| **`addTextSize`**     | <code>[number, number]</code>                                   |
-| **`addCut`**          | <code><a href="#printcut">PrintCut</a></code>                   |
-| **`addPulse`**        | <code><a href="#printwithpulse">PrintWithPulse</a></code>       |
-| **`addCommand`**      | <code>BinaryType</code>                                         |
-| **`addFeedPosition`** | <code><a href="#printfeedposition">PrintFeedPosition</a></code> |
-| **`addLayout`**       | <code><a href="#printlayout">PrintLayout</a></code>             |
+| Prop                  | Type                                                                                                      |
+| --------------------- | --------------------------------------------------------------------------------------------------------- |
+| **`addHPosition`**    | <code>number</code>                                                                                       |
+| **`addLineSpace`**    | <code>number</code>                                                                                       |
+| **`addFeedLine`**     | <code>number</code>                                                                                       |
+| **`addFeedUnit`**     | <code>number</code>                                                                                       |
+| **`addTextAlign`**    | <code><a href="#printtextalign">PrintTextAlign</a></code>                                                 |
+| **`addText`**         | <code><a href="#printtext">PrintText</a></code>                                                           |
+| **`addTextStyle`**    | <code><a href="#printtextstyle">PrintTextStyle</a></code>                                                 |
+| **`addBase64Image`**  | <code><a href="#printbase64image">PrintBase64Image</a></code>                                             |
+| **`addBarcode`**      | <code><a href="#printbarcode">PrintBarcode</a></code>                                                     |
+| **`addTextSize`**     | <code>[number, number]</code>                                                                             |
+| **`addHLine`**        | <code><a href="#printhorizontalline">PrintHorizontalLine</a></code>                                       |
+| **`addVLineBegin`**   | <code><a href="#printverticalline">PrintVerticalLine</a></code>                                           |
+| **`addVLineEnd`**     | <code><a href="#pick">Pick</a>&lt;<a href="#printverticalline">PrintVerticalLine</a>, 'lineId'&gt;</code> |
+| **`addCut`**          | <code><a href="#printcut">PrintCut</a></code>                                                             |
+| **`addPulse`**        | <code><a href="#printwithpulse">PrintWithPulse</a></code>                                                 |
+| **`addCommand`**      | <code>BinaryType</code>                                                                                   |
+| **`addFeedPosition`** | <code><a href="#printfeedposition">PrintFeedPosition</a></code>                                           |
+| **`addLayout`**       | <code><a href="#printlayout">PrintLayout</a></code>                                                       |
 
 
 #### PrintText
@@ -174,6 +177,23 @@ finalizePrinter() => Promise<{ message: string; }>
 | **`value`** | <code>string</code> |
 
 
+#### PrintHorizontalLine
+
+| Prop            | Type                                                      |
+| --------------- | --------------------------------------------------------- |
+| **`position`**  | <code>[number, number]</code>                             |
+| **`lineStyle`** | <code><a href="#printlinestyle">PrintLineStyle</a></code> |
+
+
+#### PrintVerticalLine
+
+| Prop            | Type                                                      |
+| --------------- | --------------------------------------------------------- |
+| **`position`**  | <code>number</code>                                       |
+| **`lineStyle`** | <code><a href="#printlinestyle">PrintLineStyle</a></code> |
+| **`lineId`**    | <code>number[]</code>                                     |
+
+
 #### PrintWithPulse
 
 | Prop         | Type                                            | Default           |
@@ -206,6 +226,18 @@ finalizePrinter() => Promise<{ message: string; }>
 #### PrintTextAlign
 
 <code>'left' | 'right' | 'center'</code>
+
+
+#### PrintLineStyle
+
+<code>'thin' | 'medium' | 'thick' | 'thin_double' | 'medium_double' | 'thick_double'</code>
+
+
+#### Pick
+
+From T, pick a set of properties whose keys are in the union K
+
+<code>{ [P in K]: T[P]; }</code>
 
 
 #### PrintCut

@@ -84,22 +84,22 @@ export interface PrintInstruction {
   /**
    * @description Specifies the horizontal print start position in dots.
    * @description Horizontal print start position (in dots )
-   * @value Integer from 0 to 65535
+   * @description Integer from 0 to 65535
    */
   addHPosition?: number;
   /**
-   * @value Integer from 0 to 255
+   * @description Integer from 0 to 255
    * @description Line spacing (in dots)
    */
   addLineSpace?: number;
   /**
-   * @value Integer from 0 to 255
+   * @description Integer from 0 to 255
    * @description Specifies the paper feed amount (in lines).
    * @description Paper feed amount (in lines)
    */
   addFeedLine?: number;
   /**
-   * @value Integer from 0 to 255
+   * @description Integer from 0 to 255
    * @description Specifies the paper feed amount (in dots).
    * @description Paper feed amount (in dots)
    */
@@ -110,14 +110,32 @@ export interface PrintInstruction {
   addBase64Image?: PrintBase64Image;
   addBarcode?: PrintBarcode;
   /**
-   * @value Integer from 1 to 8
+   * @description Integer from 1 to 8
    */
   addTextSize?: [number, number];
+
+  /**
+   * @description Adds a horizontal ruled line print command to the command buffer.
+   * @description Draws a horizontal ruled line.
+   */
+  addHLine?: PrintHorizontalLine;
+  /**
+   * @description Adds a command to start drawing a vertical ruled line to the command buffer.
+   * @description Starts drawing a vertical line.
+   */
+  addVLineBegin?: PrintVerticalLine;
+  /**
+   * @description Adds a command to stop drawing a vertical ruled line to the command buffer.
+   * @description Ends drawing a vertical line.
+   */
+  addVLineEnd?: Pick<PrintVerticalLine, 'lineId'>;
+
   /**
    * @description Adds a sheet cut command to the command buffer.
    * @description Specifies how to cut paper.
    */
   addCut?: PrintCut;
+
   /**
    * @description Specifies the drawer kick connector.
    * @description The drawer and optional external buzzer cannot be connected simultaneously.
@@ -129,6 +147,7 @@ export interface PrintInstruction {
    * @description Specifies the binary data.
    */
   addCommand?: BinaryType;
+
   /**
    * @description Adds a label sheet/black mark sheet feed command to the command buffer.
    */
@@ -172,55 +191,55 @@ export interface PrintLayout {
   type: PrintLayoutType;
   /**
    * @description Specifies the paper width (in 0.1 mm units).
-   * @value TM Printer Models Integer from 1 to 10000
-   * @value POS Terminal Model Integer from 290 to 600
+   * @description TM Printer Models Integer from 1 to 10000
+   * @description POS Terminal Model Integer from 290 to 600
    */
   width: number;
   /**
    * @description Specifies the distance from the print reference mark to the next print reference mark (in 0.1mm units).
-   * @value Receipt (without black mark) 0
-   * @value TM Printer Models Integer from 1 to 10000
-   * @value POS Terminal Model Integer from 0 to 1550
+   * @description Receipt (without black mark) 0
+   * @description TM Printer Models Integer from 1 to 10000
+   * @description POS Terminal Model Integer from 0 to 1550
    */
   height: number;
   /**
    * @description Specifies the distance from the print reference mark to the top of the sheet (in 0.1mm units).
-   * @value Receipt (without black mark) 0
-   * @value TM Printer Models Receipt (with black mark) Integer from -9999 to 10000
-   * @value TM Printer Models Label (without black mark) Integer from 0 to 10000
-   * @value TM Printer Models Label (with black mark) Integer from -9999 to 10000
-   * @value POS Terminal Model Receipt (with black mark) Integer from -150 to 1500
-   * @value POS Terminal Model Label (without black mark) Integer from 0 to 1500
-   * @value POS Terminal Model Label (with black mark) Integer from -15 to 1500
+   * @description Receipt (without black mark) 0
+   * @description TM Printer Models Receipt (with black mark) Integer from -9999 to 10000
+   * @description TM Printer Models Label (without black mark) Integer from 0 to 10000
+   * @description TM Printer Models Label (with black mark) Integer from -9999 to 10000
+   * @description POS Terminal Model Receipt (with black mark) Integer from -150 to 1500
+   * @description POS Terminal Model Label (without black mark) Integer from 0 to 1500
+   * @description POS Terminal Model Label (with black mark) Integer from -15 to 1500
    */
   marginTop: number;
   /**
    * @description Specifies the distance from the eject reference mark to the bottom edge of the printable area (in 0.1mm units).
-   * @value Receipt (with / without black mark) 0
-   * @value TM Printer Models Label (without black mark) Integer from -9999 to 0
-   * @value TM Printer Models Label (with black mark) Integer from -9999 to 10000
-   * @value POS Terminal Model Label (without black mark) Integer from -15 to 0
-   * @value POS Terminal Model Label (with black mark) Integer from -15 to 15
+   * @description Receipt (with / without black mark) 0
+   * @description TM Printer Models Label (without black mark) Integer from -9999 to 0
+   * @description TM Printer Models Label (with black mark) Integer from -9999 to 10000
+   * @description POS Terminal Model Label (without black mark) Integer from -15 to 0
+   * @description POS Terminal Model Label (with black mark) Integer from -15 to 15
    */
   marginBottom: number;
   /**
    * @description Specifies the distance from the eject reference mark to the cut position (in 0.1mm units).
-   * @value Receipt (without black mark) 0
-   * @value TM Printer Models Receipt (with black mark) Integer from -9999 to 10000
-   * @value TM Printer Models Label (without black mark) Integer from 0 to 10000
-   * @value TM Printer Models Label (with black mark) Integer from 0 to 10000
-   * @value POS Terminal Model Receipt (with black mark) Integer from -290 to 50
-   * @value POS Terminal Model Label (without black mark) Integer from 0 to 50
-   * @value POS Terminal Model Label (with black mark) Integer from 0 to 50
+   * @description Receipt (without black mark) 0
+   * @description TM Printer Models Receipt (with black mark) Integer from -9999 to 10000
+   * @description TM Printer Models Label (without black mark) Integer from 0 to 10000
+   * @description TM Printer Models Label (with black mark) Integer from 0 to 10000
+   * @description POS Terminal Model Receipt (with black mark) Integer from -290 to 50
+   * @description POS Terminal Model Label (without black mark) Integer from 0 to 50
+   * @description POS Terminal Model Label (with black mark) Integer from 0 to 50
    */
   offsetCut: number;
   /**
    * @description Specifies the distance from the eject reference mark to the bottom edge of the label (in 0.1mm units).
-   * @value Receipt (with without black mark) 0
-   * @value TM Printer Models Label (without black mark) 0
-   * @value TM Printer Models Label (with black mark) Integer from 0 to 10000
-   * @value POS Terminal Model Label (without black mark) 0
-   * @value POS Terminal Model Label (with black mark) Integer from 0 to 15
+   * @description Receipt (with without black mark) 0
+   * @description TM Printer Models Label (without black mark) 0
+   * @description TM Printer Models Label (with black mark) Integer from 0 to 10000
+   * @description POS Terminal Model Label (without black mark) 0
+   * @description POS Terminal Model Label (with black mark) Integer from 0 to 15
    */
   offsetLabel: number;
 }
@@ -234,6 +253,32 @@ export interface PrintWithPulse {
    * @default 100
    */
   time?: PulseTime;
+}
+
+export interface PrintHorizontalLine {
+  /**
+   * @description x1 Specifies the start position to draw a horizontal ruled line (in dots). Integer from 0 to 65535
+   * @description x2 Specifies the end position to draw a horizontal ruled line (in dots). Integer from 0 to 65535
+   */
+  position: [number, number];
+  /**
+   * @description Specifies the ruled line type.
+   */
+  lineStyle: PrintLineStyle;
+}
+export interface PrintVerticalLine {
+  /**
+   * @description Integer from 0 to 65535
+   */
+  position: number;
+  /**
+   * @description Specifies the ruled line type.
+   */
+  lineStyle: PrintLineStyle;
+  /**
+   * @description Returns the ID of the ruled line printed by this API.
+   */
+  lineId: number[];
 }
 
 export type PrintTextAlign = 'left' | 'right' | 'center';
@@ -275,3 +320,5 @@ export interface PrintBase64Image {
    */
   height?: number;
 }
+
+export type PrintLineStyle = 'thin' | 'medium' | 'thick' | 'thin_double' | 'medium_double' | 'thick_double';
