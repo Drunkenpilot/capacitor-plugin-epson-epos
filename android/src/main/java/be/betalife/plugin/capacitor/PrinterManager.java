@@ -233,7 +233,12 @@ public class PrinterManager implements ReceiveListener {
 
                                 int x1 = position.getInt(0);
                                 int x2 = position.getInt(1);
+
+                                log("H Line position ====="+x1);
+                                log("H Line position ====="+x2);
+
                                 String lineStyle = hLine.getString("lineStyle");
+
                                 mPrinter.addHLine(x1, x2, PrinterUtils.parseLineStyle(lineStyle));
                             } else {
                                 throw new IllegalArgumentException("Invalid value for addHLine");
@@ -288,6 +293,34 @@ public class PrinterManager implements ReceiveListener {
                                         height);
                             } else {
                                 throw new IllegalArgumentException("Invalid value for addBarcode");
+                            }
+                            break;
+
+
+                        case "addSymbol":
+                            if (value instanceof HashMap) {
+                                HashMap<String, Object> symbolParams = PrinterUtils.castToMap(value);
+                                String symbolValue = (String) symbolParams.get("value");
+                                String symbolType = (String) symbolParams.get("type");
+                                int finalLevel;
+                                if(symbolType.startsWith("AZTECCODE")) {
+                                    finalLevel = (int) PrinterUtils.getOrDefault(symbolParams, "level", 23);
+                                } else {
+                                    finalLevel = PrinterUtils.parseSymbolLevel((String) symbolParams.get("level")) ;
+                                }
+                                String symbolLevel = (String) symbolParams.get("level");
+
+                                int width = (int) PrinterUtils.getOrDefault(symbolParams, "width", 2);
+                                int height = (int) PrinterUtils.getOrDefault(symbolParams, "height", 3);
+                                int size = (int) PrinterUtils.getOrDefault(symbolParams, "size", 0);
+                                mPrinter.addSymbol(
+                                        symbolValue,
+                                        PrinterUtils.parseSymbolType(symbolType),
+                                        finalLevel,
+                                        width,
+                                        height,size);
+                            } else {
+                                throw new IllegalArgumentException("Invalid value for addSymbol");
                             }
                             break;
 

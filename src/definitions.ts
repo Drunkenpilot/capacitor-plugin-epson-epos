@@ -109,6 +109,7 @@ export interface PrintInstruction {
   addTextStyle?: PrintTextStyle;
   addBase64Image?: PrintBase64Image;
   addBarcode?: PrintBarcode;
+  addSymbol?: PrintSymbol;
   /**
    * @description Integer from 1 to 8
    */
@@ -177,7 +178,7 @@ export interface PrintTextStyle {
 }
 
 export interface PrintText {
-  value: string;
+  value: string | string[];
   size?: [number, number];
   align?: TextAlign;
   style?: PrintTextStyle;
@@ -216,6 +217,50 @@ export interface PrintBarcode {
    * @description Specifies the height of the barcode in dots.
    */
   height?: number;
+}
+export interface PrintSymbol {
+  /**
+   * @description Specify a string in accordance with the standard of the 2D symbol specified in type.
+   * @description When specifying binary data which cannot be represented as a string, use the following escape sequences.
+   * @description \xnn Control code (set nn in hexadecimal)
+   * @description \\ Back slash
+   */
+  value: string;
+  /**
+   * @description Specifies the 2D symbol type.
+   */
+  type: SymbolType;
+  /**
+   * @description Specifies the error correction level.
+   */
+  level?: SymbolLevelPDF | SymbolLevelQRCode | SymbolLevelAztecCode;
+  /**
+   * The range differs depending on the 2D symbol type.
+   * @default PDF417 from 2 to 8
+   * @default QRCode from 3 to 16
+   * @default MaxiCode from 1 to 255 (Ignored)
+   * @default 2DGS1 DataBar from 2 to 8
+   * @default Aztec from 2 to 16
+   * @default DataMatrix from 2 to 16
+   */
+  width?: number;
+  /**
+   * The range differs depending on the 2D symbol type.
+   * @default PDF417 from 2 to 8
+   * @default Others from 1 to 255 (Ignored)
+   */
+  height?: number;
+  /**
+   * The range differs depending on the 2D symbol type.
+   * @default PDF417 0
+   * @default QRCode from 0 to 65535 (Ignored)
+   * @default MaxiCode from 0 to 65535 (Ignored)
+   * @default 2DGS1 Expanded Stacked 0 Specifies the maximum width of the 2D symbol (106 or more).
+   * @default 2DGS1 Other Stacked from 0 to 65535 (Ignored)
+   * @default Aztec from 0 to 65535 (Ignored)
+   * @default DataMatrix from 0 to 65535 (Ignored)
+   */
+  size?: number;
 }
 
 export interface PrintLayout {
@@ -394,3 +439,47 @@ export type BarcodeHri =
   | 'HRI_ABOVE' // HRI above the barcode
   | 'HRI_BELOW' // Default: HRI below the barcode
   | 'HRI_BOTH'; // HRI above and below the barcode
+
+export type SymbolType =
+  | 'PDF417_TRUNCATED'
+  | 'QRCODE_MODEL_1'
+  | 'QRCODE_MODEL_2'
+  | 'QRCODE_MICRO'
+  | 'MAXICODE_MODE_2'
+  | 'MAXICODE_MODE_3'
+  | 'MAXICODE_MODE_4'
+  | 'MAXICODE_MODE_5'
+  | 'MAXICODE_MODE_6'
+  | 'GS1_DATABAR_STACKED'
+  | 'GS1_DATABAR_STACKED_OMNIDIRECTIONAL'
+  | 'GS1_DATABAR_EXPANDED_STACKED'
+  | 'AZTECCODE_FULLRANGE'
+  | 'AZTECCODE_COMPACT'
+  | 'DATAMATRIX_SQUARE'
+  | 'DATAMATRIX_RECTANGLE_8'
+  | 'DATAMATRIX_RECTANGLE_12'
+  | 'DATAMATRIX_RECTANGLE_16';
+
+/**
+ * @default LEVEL_1
+ */
+export type SymbolLevelPDF =
+  | 'LEVEL_0'
+  | 'LEVEL_1'
+  | 'LEVEL_2'
+  | 'LEVEL_3'
+  | 'LEVEL_4'
+  | 'LEVEL_5'
+  | 'LEVEL_6'
+  | 'LEVEL_7'
+  | 'LEVEL_8';
+
+/**
+ * @default LEVEL_M
+ */
+export type SymbolLevelQRCode = 'LEVEL_L' | 'LEVEL_M' | 'LEVEL_Q' | 'LEVEL_H';
+
+/**
+ * @default 23 Integer from 5 to 95,
+ */
+export type SymbolLevelAztecCode = number;

@@ -146,6 +146,7 @@ finalizePrinter() => Promise<{ message: string; }>
 | **`addTextStyle`**    | <code><a href="#printtextstyle">PrintTextStyle</a></code>                                                 |                         |
 | **`addBase64Image`**  | <code><a href="#printbase64image">PrintBase64Image</a></code>                                             |                         |
 | **`addBarcode`**      | <code><a href="#printbarcode">PrintBarcode</a></code>                                                     |                         |
+| **`addSymbol`**       | <code><a href="#printsymbol">PrintSymbol</a></code>                                                       |                         |
 | **`addTextSize`**     | <code>[number, number]</code>                                                                             |                         |
 | **`addHLine`**        | <code><a href="#printhorizontalline">PrintHorizontalLine</a></code>                                       |                         |
 | **`addVLineBegin`**   | <code><a href="#printverticalline">PrintVerticalLine</a></code>                                           |                         |
@@ -161,7 +162,7 @@ finalizePrinter() => Promise<{ message: string; }>
 
 | Prop        | Type                                                      |
 | ----------- | --------------------------------------------------------- |
-| **`value`** | <code>string</code>                                       |
+| **`value`** | <code>string \| string[]</code>                           |
 | **`size`**  | <code>[number, number]</code>                             |
 | **`align`** | <code><a href="#textalign">TextAlign</a></code>           |
 | **`style`** | <code><a href="#printtextstyle">PrintTextStyle</a></code> |
@@ -197,6 +198,18 @@ finalizePrinter() => Promise<{ message: string; }>
 | **`hri`**    | <code><a href="#barcodehri">BarcodeHri</a></code>   | <code>HRI_BELOW</code>                 |
 | **`width`**  | <code>number</code>                                 | <code>2 Integer from 2 to 6</code>     |
 | **`height`** | <code>number</code>                                 | <code>100 Integer from 1 to 255</code> |
+
+
+#### PrintSymbol
+
+| Prop         | Type                                                                                                                      | Description                                        | Default                         |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------------- |
+| **`value`**  | <code>string</code>                                                                                                       |                                                    |                                 |
+| **`type`**   | <code><a href="#symboltype">SymbolType</a></code>                                                                         |                                                    |                                 |
+| **`level`**  | <code>number \| <a href="#symbollevelpdf">SymbolLevelPDF</a> \| <a href="#symbollevelqrcode">SymbolLevelQRCode</a></code> |                                                    |                                 |
+| **`width`**  | <code>number</code>                                                                                                       | The range differs depending on the 2D symbol type. | <code>PDF417 from 2 to 8</code> |
+| **`height`** | <code>number</code>                                                                                                       | The range differs depending on the 2D symbol type. | <code>PDF417 from 2 to 8</code> |
+| **`size`**   | <code>number</code>                                                                                                       | The range differs depending on the 2D symbol type. | <code>PDF417 0</code>           |
 
 
 #### PrintHorizontalLine
@@ -269,6 +282,26 @@ Types representing the allowed barcode fonts.
 Types representing the allowed barcode HRI (Human Readable Interpretation) positions.
 
 <code>'HRI_NONE' | 'HRI_ABOVE' | 'HRI_BELOW' | 'HRI_BOTH'</code>
+
+
+#### SymbolType
+
+<code>'PDF417_TRUNCATED' | 'QRCODE_MODEL_1' | 'QRCODE_MODEL_2' | 'QRCODE_MICRO' | 'MAXICODE_MODE_2' | 'MAXICODE_MODE_3' | 'MAXICODE_MODE_4' | 'MAXICODE_MODE_5' | 'MAXICODE_MODE_6' | 'GS1_DATABAR_STACKED' | 'GS1_DATABAR_STACKED_OMNIDIRECTIONAL' | 'GS1_DATABAR_EXPANDED_STACKED' | 'AZTECCODE_FULLRANGE' | 'AZTECCODE_COMPACT' | 'DATAMATRIX_SQUARE' | 'DATAMATRIX_RECTANGLE_8' | 'DATAMATRIX_RECTANGLE_12' | 'DATAMATRIX_RECTANGLE_16'</code>
+
+
+#### SymbolLevelPDF
+
+<code>'LEVEL_0' | 'LEVEL_1' | 'LEVEL_2' | 'LEVEL_3' | 'LEVEL_4' | 'LEVEL_5' | 'LEVEL_6' | 'LEVEL_7' | 'LEVEL_8'</code>
+
+
+#### SymbolLevelQRCode
+
+<code>'LEVEL_L' | 'LEVEL_M' | 'LEVEL_Q' | 'LEVEL_H'</code>
+
+
+#### SymbolLevelAztecCode
+
+<code>number</code>
 
 
 #### LineStyle

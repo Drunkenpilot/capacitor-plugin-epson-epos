@@ -217,6 +217,54 @@ public class PrinterUtils {
         };
     }
 
+    public static int parseSymbolType(String type) {
+        return switch (type.toUpperCase()) {
+            case "PDF417_TRUNCATED" -> Printer.SYMBOL_PDF417_TRUNCATED;
+            case "QRCODE_MODEL_1" -> Printer.SYMBOL_QRCODE_MODEL_1;
+            case "QRCODE_MODEL_2" -> Printer.SYMBOL_QRCODE_MODEL_2;
+            case "QRCODE_MICRO" -> Printer.SYMBOL_QRCODE_MICRO;
+            case "MAXICODE_MODE_2" -> Printer.SYMBOL_MAXICODE_MODE_2;
+            case "MAXICODE_MODE_3" -> Printer.SYMBOL_MAXICODE_MODE_3;
+            case "MAXICODE_MODE_4" -> Printer.SYMBOL_MAXICODE_MODE_4;
+            case "MAXICODE_MODE_5" -> Printer.SYMBOL_MAXICODE_MODE_5;
+            case "MAXICODE_MODE_6" -> Printer.SYMBOL_MAXICODE_MODE_6;
+            case "GS1_DATABAR_STACKED" -> Printer.SYMBOL_GS1_DATABAR_STACKED;
+            case "GS1_DATABAR_STACKED_OMNIDIRECTIONAL" ->
+                    Printer.SYMBOL_GS1_DATABAR_STACKED_OMNIDIRECTIONAL;
+            case "GS1_DATABAR_EXPANDED_STACKED" -> Printer.SYMBOL_GS1_DATABAR_EXPANDED_STACKED;
+            case "AZTECCODE_FULLRANGE" -> Printer.SYMBOL_AZTECCODE_FULLRANGE;
+            case "AZTECCODE_COMPACT" -> Printer.SYMBOL_AZTECCODE_COMPACT;
+            case "DATAMATRIX_SQUARE" -> Printer.SYMBOL_DATAMATRIX_SQUARE;
+            case "DATAMATRIX_RECTANGLE_8" -> Printer.SYMBOL_DATAMATRIX_RECTANGLE_8;
+            case "DATAMATRIX_RECTANGLE_12" -> Printer.SYMBOL_DATAMATRIX_RECTANGLE_12;
+            case "DATAMATRIX_RECTANGLE_16" -> Printer.SYMBOL_DATAMATRIX_RECTANGLE_16;
+            default -> Printer.SYMBOL_PDF417_STANDARD;
+        };
+    }
+
+    public static int parseSymbolLevel(String level) {
+        if (level == null) {
+            return Printer.PARAM_DEFAULT;
+        }
+        return switch (level.toUpperCase()) {
+            case "LEVEL_0" -> Printer.LEVEL_0;
+            case "LEVEL_1" -> Printer.LEVEL_1;
+            case "LEVEL_2" -> Printer.LEVEL_2;
+            case "LEVEL_3" -> Printer.LEVEL_3;
+            case "LEVEL_4" -> Printer.LEVEL_4;
+            case "LEVEL_5" -> Printer.LEVEL_5;
+            case "LEVEL_6" -> Printer.LEVEL_6;
+            case "LEVEL_7" -> Printer.LEVEL_7;
+            case "LEVEL_8" -> Printer.LEVEL_8;
+            case "LEVEL_L" -> Printer.LEVEL_L;
+            case "LEVEL_M" -> Printer.LEVEL_M;
+            case "LEVEL_Q" -> Printer.LEVEL_Q;
+            case "LEVEL_H" -> Printer.LEVEL_H;
+            default -> Printer.PARAM_DEFAULT;
+        };
+    }
+
+
     public static <K, V> V getOrDefault(Map<K, V> map, K key, V defaultValue) {
         return map.containsKey(key) ? map.get(key) : defaultValue;
     }
@@ -254,7 +302,21 @@ public class PrinterUtils {
             }
             if (jsonObject.has("addText")) {
                 JSONObject textObject = jsonObject.getJSONObject("addText");
-                command.put("addText", textObject.getString("value"));
+                Object value = textObject.get("value");
+                if (value instanceof String) {
+                    command.put("addText", value);
+                } else if(value instanceof JSONArray textArray) {
+                    StringBuilder combinedText = new StringBuilder();
+
+                    for (int j = 0; j < textArray.length(); j++) {
+                        combinedText.append(textArray.getString(j));
+                        combinedText.append("\n"); // Add a newline between texts
+                    }
+
+                    command.put("addText", combinedText.toString());
+                }else {
+                    throw new IllegalArgumentException("Unsupported value type for addText: " + value.getClass().getName());
+                }
 
                 if (textObject.has("size")) {
                     command.put("addTextSize", parseSizeArray(textObject.getJSONArray("size")));
@@ -307,17 +369,55 @@ public class PrinterUtils {
                 command.put("addVLineBegin", jsonObject.getJSONObject("addVLineBegin")); // Store as JSONObject for further parsing
                 command.put("addVLineEnd", jsonObject.getJSONObject("addVLineEnd")); // Store as JSONObject for further parsing
             }
+
             if (jsonObject.has("addBarcode")) {
                 JSONObject barcodeObject = jsonObject.getJSONObject("addBarcode");
                 HashMap<String, Object> barcodeCommand = new HashMap<>();
                 barcodeCommand.put("value", barcodeObject.getString("value"));
-                barcodeCommand.put("type", barcodeObject.getString("type"));
-                barcodeCommand.put("hri", barcodeObject.getString("hri"));
-                barcodeCommand.put("font", barcodeObject.getString("font"));
-                barcodeCommand.put("width", barcodeObject.getInt("width"));
-                barcodeCommand.put("height", barcodeObject.getInt("height"));
+                if (barcodeObject.has("type")) {
+                    barcodeCommand.put("type", barcodeObject.getString("type"));
+                }
+
+                if (barcodeObject.has("hri")) {
+                    barcodeCommand.put("hri", barcodeObject.getString("hri"));
+                }
+
+                if (barcodeObject.has("font")) {
+                    barcodeCommand.put("font", barcodeObject.getString("font"));
+                }
+
+                barcodeCommand.put("width", barcodeObject.optInt("width", 2));
+                barcodeCommand.put("height", barcodeObject.optInt("height", 100));
                 command.put("addBarcode", barcodeCommand);
             }
+
+            if (jsonObject.has("addSymbol")) {
+                JSONObject symbolObject = jsonObject.getJSONObject("addSymbol");
+                HashMap<String, Object> symbolCommand = new HashMap<>();
+                symbolCommand.put("value", symbolObject.getString("value"));
+                String symbolType = "";
+                if (symbolObject.has("type")) {
+                    symbolType = symbolObject.getString("type");
+                    symbolCommand.put("type", symbolType);
+                }
+
+                if(symbolType.startsWith("AZTECCODE")) {
+                    if (symbolObject.has("level")) {
+                        symbolCommand.put("level", symbolObject.optInt("level", 23));
+                    }
+                } else {
+                    if (symbolObject.has("level")) {
+                        symbolCommand.put("level", symbolObject.getString("level"));
+                    }
+                }
+
+                symbolCommand.put("width", symbolObject.optInt("width", 2));
+                symbolCommand.put("height", symbolObject.optInt("height", 3));
+                symbolCommand.put("size", symbolObject.optInt("size", 0));
+
+                command.put("addSymbol", symbolCommand);
+            }
+
             if (jsonObject.has("addTextSize")) {
                 command.put("addTextSize", parseSizeArray(jsonObject.getJSONArray("addTextSize")));
             }
