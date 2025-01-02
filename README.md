@@ -16,6 +16,9 @@ npm install capacitor-plugin-epson-epos
 npx cap sync
 ```
 
+## How to use
+[See examples here](how-to-use.md)
+
 ## API
 
 <docgen-index>
