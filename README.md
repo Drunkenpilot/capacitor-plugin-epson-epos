@@ -17,7 +17,9 @@ npx cap sync
 ```
 
 ## How to use
-[See examples here](how-to-use.md)
+- [See examples here](docs/how-to-use.md)
+
+- [ePOS SDK Android - User's manual](docs/ePOS_SDK_Android_um_en_revAE.pdf)
 
 ## API
 
@@ -316,7 +318,9 @@ Types representing the allowed barcode HRI (Human Readable Interpretation) posit
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{ [P in K]: T[P]; }</code>
+<code>{
+ [P in K]: T[P];
+ }</code>
 
 
 #### Cut
