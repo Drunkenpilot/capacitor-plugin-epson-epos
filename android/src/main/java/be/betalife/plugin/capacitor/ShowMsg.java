@@ -1,9 +1,9 @@
 package be.betalife.plugin.capacitor;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.widget.Toast;
 
 import com.epson.epos2.Epos2Exception;
@@ -11,7 +11,7 @@ import com.epson.epos2.Epos2CallbackCode;
 
 public class ShowMsg {
     public static void showException(Exception e, String method, Context context) {
-        String msg = "";
+        String msg;
         if (e instanceof Epos2Exception) {
             msg = String.format(
                     "%s\n\t%s\n%s\n\t%s",
@@ -26,7 +26,7 @@ public class ShowMsg {
     }
 
     public static void showResult(int code, String errMsg, Context context) {
-        String msg = "";
+        String msg;
         if (errMsg.isEmpty()) {
             msg = String.format(
                     "\t%s\n\t%s\n",
@@ -48,9 +48,8 @@ public class ShowMsg {
     }
 
     private static void show(final String msg, final Context context) {
-        if (context instanceof Activity) {
+        if (context instanceof Activity activity) {
             // 如果是 Activity，正常显示对话框
-            Activity activity = (Activity) context;
             new AlertDialog.Builder(activity)
                     .setMessage(msg)
                     .setPositiveButton("OK", null)
@@ -59,237 +58,86 @@ public class ShowMsg {
             // 如果是 ApplicationContext，可以考虑使用 Toast
             Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
         }
-//        Activity activity = (Activity) context;
-//
-//        activity.runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-//                alertDialog.setMessage(msg);
-//                alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int whichButton) {
-//                        return;
-//                    }
-//                });
-//                alertDialog.create();
-//                alertDialog.show();
-//            }
-//        });
+
     }
 
+    @SuppressLint("DefaultLocale")
     private static String getEposExceptionText(int state) {
-        String return_text = "";
-        switch (state) {
-            case Epos2Exception.ERR_PARAM:
-                return_text = "ERR_PARAM";
-                break;
-            case Epos2Exception.ERR_CONNECT:
-                return_text = "ERR_CONNECT";
-                break;
-            case Epos2Exception.ERR_TIMEOUT:
-                return_text = "ERR_TIMEOUT";
-                break;
-            case Epos2Exception.ERR_MEMORY:
-                return_text = "ERR_MEMORY";
-                break;
-            case Epos2Exception.ERR_ILLEGAL:
-                return_text = "ERR_ILLEGAL";
-                break;
-            case Epos2Exception.ERR_PROCESSING:
-                return_text = "ERR_PROCESSING";
-                break;
-            case Epos2Exception.ERR_NOT_FOUND:
-                return_text = "ERR_NOT_FOUND";
-                break;
-            case Epos2Exception.ERR_IN_USE:
-                return_text = "ERR_IN_USE";
-                break;
-            case Epos2Exception.ERR_TYPE_INVALID:
-                return_text = "ERR_TYPE_INVALID";
-                break;
-            case Epos2Exception.ERR_DISCONNECT:
-                return_text = "ERR_DISCONNECT";
-                break;
-            case Epos2Exception.ERR_ALREADY_OPENED:
-                return_text = "ERR_ALREADY_OPENED";
-                break;
-            case Epos2Exception.ERR_ALREADY_USED:
-                return_text = "ERR_ALREADY_USED";
-                break;
-            case Epos2Exception.ERR_BOX_COUNT_OVER:
-                return_text = "ERR_BOX_COUNT_OVER";
-                break;
-            case Epos2Exception.ERR_BOX_CLIENT_OVER:
-                return_text = "ERR_BOX_CLIENT_OVER";
-                break;
-            case Epos2Exception.ERR_UNSUPPORTED:
-                return_text = "ERR_UNSUPPORTED";
-                break;
-            case Epos2Exception.ERR_FAILURE:
-                return_text = "ERR_FAILURE";
-                break;
-            default:
-                return_text = String.format("%d", state);
-                break;
-        }
-        return return_text;
+        return switch (state) {
+            case Epos2Exception.ERR_PARAM -> "ERR_PARAM";
+            case Epos2Exception.ERR_CONNECT -> "ERR_CONNECT";
+            case Epos2Exception.ERR_TIMEOUT -> "ERR_TIMEOUT";
+            case Epos2Exception.ERR_MEMORY -> "ERR_MEMORY";
+            case Epos2Exception.ERR_ILLEGAL -> "ERR_ILLEGAL";
+            case Epos2Exception.ERR_PROCESSING -> "ERR_PROCESSING";
+            case Epos2Exception.ERR_NOT_FOUND -> "ERR_NOT_FOUND";
+            case Epos2Exception.ERR_IN_USE -> "ERR_IN_USE";
+            case Epos2Exception.ERR_TYPE_INVALID -> "ERR_TYPE_INVALID";
+            case Epos2Exception.ERR_DISCONNECT -> "ERR_DISCONNECT";
+            case Epos2Exception.ERR_ALREADY_OPENED -> "ERR_ALREADY_OPENED";
+            case Epos2Exception.ERR_ALREADY_USED -> "ERR_ALREADY_USED";
+            case Epos2Exception.ERR_BOX_COUNT_OVER -> "ERR_BOX_COUNT_OVER";
+            case Epos2Exception.ERR_BOX_CLIENT_OVER -> "ERR_BOX_CLIENT_OVER";
+            case Epos2Exception.ERR_UNSUPPORTED -> "ERR_UNSUPPORTED";
+            case Epos2Exception.ERR_FAILURE -> "ERR_FAILURE";
+            default -> String.format("%d", state);
+        };
     }
 
+    @SuppressLint("DefaultLocale")
     private static String getCodeText(int state) {
-        String return_text = "";
-        switch (state) {
-            case Epos2CallbackCode.CODE_SUCCESS:
-                return_text = "PRINT_SUCCESS";
-                break;
-            case Epos2CallbackCode.CODE_PRINTING:
-                return_text = "PRINTING";
-                break;
-            case Epos2CallbackCode.CODE_ERR_AUTORECOVER:
-                return_text = "ERR_AUTORECOVER";
-                break;
-            case Epos2CallbackCode.CODE_ERR_COVER_OPEN:
-                return_text = "ERR_COVER_OPEN";
-                break;
-            case Epos2CallbackCode.CODE_ERR_CUTTER:
-                return_text = "ERR_CUTTER";
-                break;
-            case Epos2CallbackCode.CODE_ERR_MECHANICAL:
-                return_text = "ERR_MECHANICAL";
-                break;
-            case Epos2CallbackCode.CODE_ERR_EMPTY:
-                return_text = "ERR_EMPTY";
-                break;
-            case Epos2CallbackCode.CODE_ERR_UNRECOVERABLE:
-                return_text = "ERR_UNRECOVERABLE";
-                break;
-            case Epos2CallbackCode.CODE_ERR_FAILURE:
-                return_text = "ERR_FAILURE";
-                break;
-            case Epos2CallbackCode.CODE_ERR_NOT_FOUND:
-                return_text = "ERR_NOT_FOUND";
-                break;
-            case Epos2CallbackCode.CODE_ERR_SYSTEM:
-                return_text = "ERR_SYSTEM";
-                break;
-            case Epos2CallbackCode.CODE_ERR_PORT:
-                return_text = "ERR_PORT";
-                break;
-            case Epos2CallbackCode.CODE_ERR_TIMEOUT:
-                return_text = "ERR_TIMEOUT";
-                break;
-            case Epos2CallbackCode.CODE_ERR_JOB_NOT_FOUND:
-                return_text = "ERR_JOB_NOT_FOUND";
-                break;
-            case Epos2CallbackCode.CODE_ERR_SPOOLER:
-                return_text = "ERR_SPOOLER";
-                break;
-            case Epos2CallbackCode.CODE_ERR_BATTERY_LOW:
-                return_text = "ERR_BATTERY_LOW";
-                break;
-            case Epos2CallbackCode.CODE_ERR_TOO_MANY_REQUESTS:
-                return_text = "ERR_TOO_MANY_REQUESTS";
-                break;
-            case Epos2CallbackCode.CODE_ERR_REQUEST_ENTITY_TOO_LARGE:
-                return_text = "ERR_REQUEST_ENTITY_TOO_LARGE";
-                break;
-            case Epos2CallbackCode.CODE_CANCELED:
-                return_text = "CODE_CANCELED";
-                break;
-            case Epos2CallbackCode.CODE_ERR_NO_MICR_DATA:
-                return_text = "ERR_NO_MICR_DATA";
-                break;
-            case Epos2CallbackCode.CODE_ERR_ILLEGAL_LENGTH:
-                return_text = "ERR_ILLEGAL_LENGTH";
-                break;
-            case Epos2CallbackCode.CODE_ERR_NO_MAGNETIC_DATA:
-                return_text = "ERR_NO_MAGNETIC_DATA";
-                break;
-            case Epos2CallbackCode.CODE_ERR_RECOGNITION:
-                return_text = "ERR_RECOGNITION";
-                break;
-            case Epos2CallbackCode.CODE_ERR_READ:
-                return_text = "ERR_READ";
-                break;
-            case Epos2CallbackCode.CODE_ERR_NOISE_DETECTED:
-                return_text = "ERR_NOISE_DETECTED";
-                break;
-            case Epos2CallbackCode.CODE_ERR_PAPER_JAM:
-                return_text = "ERR_PAPER_JAM";
-                break;
-            case Epos2CallbackCode.CODE_ERR_PAPER_PULLED_OUT:
-                return_text = "ERR_PAPER_PULLED_OUT";
-                break;
-            case Epos2CallbackCode.CODE_ERR_CANCEL_FAILED:
-                return_text = "ERR_CANCEL_FAILED";
-                break;
-            case Epos2CallbackCode.CODE_ERR_PAPER_TYPE:
-                return_text = "ERR_PAPER_TYPE";
-                break;
-            case Epos2CallbackCode.CODE_ERR_WAIT_INSERTION:
-                return_text = "ERR_WAIT_INSERTION";
-                break;
-            case Epos2CallbackCode.CODE_ERR_ILLEGAL:
-                return_text = "ERR_ILLEGAL";
-                break;
-            case Epos2CallbackCode.CODE_ERR_INSERTED:
-                return_text = "ERR_INSERTED";
-                break;
-            case Epos2CallbackCode.CODE_ERR_WAIT_REMOVAL:
-                return_text = "ERR_WAIT_REMOVAL";
-                break;
-            case Epos2CallbackCode.CODE_ERR_DEVICE_BUSY:
-                return_text = "ERR_DEVICE_BUSY";
-                break;
-            case Epos2CallbackCode.CODE_ERR_IN_USE:
-                return_text = "ERR_IN_USE";
-                break;
-            case Epos2CallbackCode.CODE_ERR_CONNECT:
-                return_text = "ERR_CONNECT";
-                break;
-            case Epos2CallbackCode.CODE_ERR_DISCONNECT:
-                return_text = "ERR_DISCONNECT";
-                break;
-            case Epos2CallbackCode.CODE_ERR_MEMORY:
-                return_text = "ERR_MEMORY";
-                break;
-            case Epos2CallbackCode.CODE_ERR_PROCESSING:
-                return_text = "ERR_PROCESSING";
-                break;
-            case Epos2CallbackCode.CODE_ERR_PARAM:
-                return_text = "ERR_PARAM";
-                break;
-            case Epos2CallbackCode.CODE_RETRY:
-                return_text = "RETRY";
-                break;
-            case Epos2CallbackCode.CODE_ERR_DIFFERENT_MODEL:
-                return_text = "ERR_DIFFERENT_MODEL";
-                break;
-            case Epos2CallbackCode.CODE_ERR_DIFFERENT_VERSION:
-                return_text = "ERR_DIFFERENT_VERSION";
-                break;
-            case Epos2CallbackCode.CODE_ERR_DATA_CORRUPTED:
-                return_text = "ERR_DATA_CORRUPTED";
-                break;
-            case Epos2CallbackCode.CODE_ERR_JSON_FORMAT:
-                return_text = "ERR_JSON_FORMAT";
-                break;
-            case Epos2CallbackCode.CODE_NO_PASSWORD:
-                return_text = "NO_PASSWORD";
-                break;
-            case Epos2CallbackCode.CODE_ERR_INVALID_PASSWORD:
-                return_text = "ERR_INVALID_PASSWORD";
-                break;
-            case Epos2CallbackCode.CODE_ERR_INVALID_FIRM_VERSION:
-                return_text = "ERR_INVALID_FIRM_VERSION";
-                break;
-            case Epos2CallbackCode.CODE_ERR_SSL_CERTIFICATION:
-                return_text = "ERR_SSL_CERTIFICATION";
-                break;
-            default:
-                return_text = String.format("%d", state);
-                break;
-        }
-        return return_text;
+        return switch (state) {
+            case Epos2CallbackCode.CODE_SUCCESS -> "PRINT_SUCCESS";
+            case Epos2CallbackCode.CODE_PRINTING -> "PRINTING";
+            case Epos2CallbackCode.CODE_ERR_AUTORECOVER -> "ERR_AUTORECOVER";
+            case Epos2CallbackCode.CODE_ERR_COVER_OPEN -> "ERR_COVER_OPEN";
+            case Epos2CallbackCode.CODE_ERR_CUTTER -> "ERR_CUTTER";
+            case Epos2CallbackCode.CODE_ERR_MECHANICAL -> "ERR_MECHANICAL";
+            case Epos2CallbackCode.CODE_ERR_EMPTY -> "ERR_EMPTY";
+            case Epos2CallbackCode.CODE_ERR_UNRECOVERABLE -> "ERR_UNRECOVERABLE";
+            case Epos2CallbackCode.CODE_ERR_FAILURE -> "ERR_FAILURE";
+            case Epos2CallbackCode.CODE_ERR_NOT_FOUND -> "ERR_NOT_FOUND";
+            case Epos2CallbackCode.CODE_ERR_SYSTEM -> "ERR_SYSTEM";
+            case Epos2CallbackCode.CODE_ERR_PORT -> "ERR_PORT";
+            case Epos2CallbackCode.CODE_ERR_TIMEOUT -> "ERR_TIMEOUT";
+            case Epos2CallbackCode.CODE_ERR_JOB_NOT_FOUND -> "ERR_JOB_NOT_FOUND";
+            case Epos2CallbackCode.CODE_ERR_SPOOLER -> "ERR_SPOOLER";
+            case Epos2CallbackCode.CODE_ERR_BATTERY_LOW -> "ERR_BATTERY_LOW";
+            case Epos2CallbackCode.CODE_ERR_TOO_MANY_REQUESTS -> "ERR_TOO_MANY_REQUESTS";
+            case Epos2CallbackCode.CODE_ERR_REQUEST_ENTITY_TOO_LARGE ->
+                    "ERR_REQUEST_ENTITY_TOO_LARGE";
+            case Epos2CallbackCode.CODE_CANCELED -> "CODE_CANCELED";
+            case Epos2CallbackCode.CODE_ERR_NO_MICR_DATA -> "ERR_NO_MICR_DATA";
+            case Epos2CallbackCode.CODE_ERR_ILLEGAL_LENGTH -> "ERR_ILLEGAL_LENGTH";
+            case Epos2CallbackCode.CODE_ERR_NO_MAGNETIC_DATA -> "ERR_NO_MAGNETIC_DATA";
+            case Epos2CallbackCode.CODE_ERR_RECOGNITION -> "ERR_RECOGNITION";
+            case Epos2CallbackCode.CODE_ERR_READ -> "ERR_READ";
+            case Epos2CallbackCode.CODE_ERR_NOISE_DETECTED -> "ERR_NOISE_DETECTED";
+            case Epos2CallbackCode.CODE_ERR_PAPER_JAM -> "ERR_PAPER_JAM";
+            case Epos2CallbackCode.CODE_ERR_PAPER_PULLED_OUT -> "ERR_PAPER_PULLED_OUT";
+            case Epos2CallbackCode.CODE_ERR_CANCEL_FAILED -> "ERR_CANCEL_FAILED";
+            case Epos2CallbackCode.CODE_ERR_PAPER_TYPE -> "ERR_PAPER_TYPE";
+            case Epos2CallbackCode.CODE_ERR_WAIT_INSERTION -> "ERR_WAIT_INSERTION";
+            case Epos2CallbackCode.CODE_ERR_ILLEGAL -> "ERR_ILLEGAL";
+            case Epos2CallbackCode.CODE_ERR_INSERTED -> "ERR_INSERTED";
+            case Epos2CallbackCode.CODE_ERR_WAIT_REMOVAL -> "ERR_WAIT_REMOVAL";
+            case Epos2CallbackCode.CODE_ERR_DEVICE_BUSY -> "ERR_DEVICE_BUSY";
+            case Epos2CallbackCode.CODE_ERR_IN_USE -> "ERR_IN_USE";
+            case Epos2CallbackCode.CODE_ERR_CONNECT -> "ERR_CONNECT";
+            case Epos2CallbackCode.CODE_ERR_DISCONNECT -> "ERR_DISCONNECT";
+            case Epos2CallbackCode.CODE_ERR_MEMORY -> "ERR_MEMORY";
+            case Epos2CallbackCode.CODE_ERR_PROCESSING -> "ERR_PROCESSING";
+            case Epos2CallbackCode.CODE_ERR_PARAM -> "ERR_PARAM";
+            case Epos2CallbackCode.CODE_RETRY -> "RETRY";
+            case Epos2CallbackCode.CODE_ERR_DIFFERENT_MODEL -> "ERR_DIFFERENT_MODEL";
+            case Epos2CallbackCode.CODE_ERR_DIFFERENT_VERSION -> "ERR_DIFFERENT_VERSION";
+            case Epos2CallbackCode.CODE_ERR_DATA_CORRUPTED -> "ERR_DATA_CORRUPTED";
+            case Epos2CallbackCode.CODE_ERR_JSON_FORMAT -> "ERR_JSON_FORMAT";
+            case Epos2CallbackCode.CODE_NO_PASSWORD -> "NO_PASSWORD";
+            case Epos2CallbackCode.CODE_ERR_INVALID_PASSWORD -> "ERR_INVALID_PASSWORD";
+            case Epos2CallbackCode.CODE_ERR_INVALID_FIRM_VERSION -> "ERR_INVALID_FIRM_VERSION";
+            case Epos2CallbackCode.CODE_ERR_SSL_CERTIFICATION -> "ERR_SSL_CERTIFICATION";
+            default -> String.format("%d", state);
+        };
     }
 }

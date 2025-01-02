@@ -5,9 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.epson.epos2.Epos2Exception;
-import com.epson.epos2.discovery.DeviceInfo;
 import com.epson.epos2.discovery.Discovery;
-import com.epson.epos2.discovery.DiscoveryListener;
 import com.epson.epos2.discovery.FilterOption;
 
 import java.util.ArrayList;
@@ -41,14 +39,11 @@ public class PortDiscovery {
         discoveredPrinters.clear();
 
         try {
-            Discovery.start(context, filterOption, new DiscoveryListener() {
-                @Override
-                public void onDiscovery(DeviceInfo deviceInfo) {
-                    HashMap<String, String> printer = new HashMap<>();
-                    printer.put("PrinterName", deviceInfo.getDeviceName());
-                    printer.put("Target", deviceInfo.getTarget());
-                    discoveredPrinters.add(printer);
-                }
+            Discovery.start(context, filterOption, deviceInfo -> {
+                HashMap<String, String> printer = new HashMap<>();
+                printer.put("PrinterName", deviceInfo.getDeviceName());
+                printer.put("Target", deviceInfo.getTarget());
+                discoveredPrinters.add(printer);
             });
 
             isDiscovering = true;
@@ -75,4 +70,6 @@ public class PortDiscovery {
             callback.onError("Failed to stop discovery: " + e.getErrorStatus());
         }
     }
+
+
 }

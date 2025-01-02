@@ -1,9 +1,15 @@
 import { CapacitorException, ExceptionCode, WebPlugin } from '@capacitor/core';
 
-import type { DiscoveryResult, EpsonEposPlugin, PrintOptions } from './definitions';
+import type { DiscoveryOptions, DiscoveryResult, EpsonEposPlugin, PrintOptions } from './definitions';
 
 export class EpsonEposWeb extends WebPlugin implements EpsonEposPlugin {
-  async startDiscovery(options: { timeout: number; broadcast?: string }): Promise<DiscoveryResult> {
+  async requestPermission(): Promise<{ success: boolean }> {
+    console.log('Simulating requestPermission');
+    this.createUnavailableException();
+    return Promise.resolve({ success: true });
+  }
+
+  async startDiscovery(options: DiscoveryOptions): Promise<DiscoveryResult> {
     console.log('Simulating discovery with options:', options);
 
     // Simulate a list of discovered printers

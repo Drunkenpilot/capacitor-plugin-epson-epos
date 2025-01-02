@@ -11,15 +11,12 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import com.epson.epos2.discovery.FilterOption;
 import com.epson.epos2.discovery.Discovery;
 
-import org.json.JSONObject;
 
 @CapacitorPlugin(name = "EpsonEpos")
 public class EpsonEposPlugin extends Plugin {
@@ -29,7 +26,6 @@ public class EpsonEposPlugin extends Plugin {
     private PortDiscovery portDiscovery;
     private PrinterManager printerManager;
 
-    private PrinterUtils printerUtils;
 
     @Override
     public void load() {
@@ -38,33 +34,29 @@ public class EpsonEposPlugin extends Plugin {
         portDiscovery = new PortDiscovery(context);
         activity = getActivity();
         printerManager = new PrinterManager(activity);
-        printerUtils = new PrinterUtils();
+    }
+
+    @PluginMethod
+    public void requestPermission(PluginCall call) {
+        try {
+            printerManager.requestRuntimePermission();
+            call.resolve(new JSObject().put("success", true));
+        } catch (Exception e) {
+            call.reject("Failed to request permissions: " + e.getMessage());
+        }
     }
 
     @PluginMethod
     public void startDiscovery(PluginCall call) {
         Log.d(TAG, "startDiscovery called");
 
-        long timeout = call.getLong("timeout", 10000L); // 默认超时时间为10秒
+        Long timeoutValue = call.getLong("timeout"); // 获取可能为 null 的值
+        long timeout = (timeoutValue != null) ? timeoutValue : 10000L; // 如果为 null，使用默认值, 默认超时时间为10秒
+
         String portType = call.getString("portType", "ALL"); // 默认端口类型为 "ALL"
         FilterOption filterOption = new FilterOption();
 
-        // 根据传入的 portType 设置端口类型
-        switch (portType.toUpperCase()) {
-            case "TCP":
-                filterOption.setPortType(Discovery.PORTTYPE_TCP);
-                break;
-            case "BLUETOOTH":
-                filterOption.setPortType(Discovery.PORTTYPE_BLUETOOTH);
-                break;
-            case "USB":
-                filterOption.setPortType(Discovery.PORTTYPE_USB);
-                break;
-            default:
-                filterOption.setPortType(Discovery.PORTTYPE_ALL); // 默认设置为 ALL
-                break;
-        }
-
+        filterOption.setPortType(PrinterUtils.parsePrinterPortType(portType));
         filterOption.setBroadcast(call.getString("broadcast", "255.255.255.255")); // 默认广播地址
         filterOption.setDeviceModel(Discovery.MODEL_ALL);
         filterOption.setEpsonFilter(Discovery.FILTER_NONE);
@@ -131,14 +123,14 @@ public class EpsonEposPlugin extends Plugin {
 
         List<HashMap<String, Object>> commands;
         try {
-            commands = printerUtils.parseInstructions(jsArray);
+            commands = PrinterUtils.parseInstructions(jsArray);
         } catch (Exception e) {
             call.reject("Failed to parse instructions: " + e.getMessage());
             return;
         }
 
-        int lang = printerUtils.parsePrinterLang(langCode);
-        int printerSeries = printerUtils.parsePrinterSeries(printerModelCode);
+        int lang = PrinterUtils.parsePrinterLang(langCode);
+        int printerSeries = PrinterUtils.parsePrinterSeries(printerModelCode);
         // 初始化打印机
         if (!printerManager.initializePrinter(printerSeries, lang, getContext())) {
             call.reject("Failed to initialize printer");
@@ -162,9 +154,7 @@ public class EpsonEposPlugin extends Plugin {
         printerManager.printData(new PrinterManager.PrinterCallback() {
             @Override
             public void onSuccess() {
-                activity.runOnUiThread(() -> {
-                    call.resolve(new JSObject().put("success", true));
-                });
+                activity.runOnUiThread(() -> call.resolve(new JSObject().put("success", true)));
             }
 
             @Override

@@ -1,5 +1,6 @@
 export interface EpsonEposPlugin {
-  startDiscovery(options: StartDiscoveryOptions): Promise<DiscoveryResult>;
+  requestPermission(): Promise<{ success: boolean }>;
+  startDiscovery(options: DiscoveryOptions): Promise<DiscoveryResult>;
   stopDiscovery(): Promise<{ message: string }>;
   // Print with flexible instructions
   print(options: PrintOptions): Promise<{ success: boolean }>;
@@ -7,10 +8,9 @@ export interface EpsonEposPlugin {
   finalizePrinter(): Promise<{ message: string }>;
 }
 
-export interface StartDiscoveryOptions {
+export interface DiscoveryOptions {
   /**
-   * @default 10000
-   * @description default value 10 seconds
+   * @default 10000 (milliseconds)
    */
   timeout?: number;
   /**
@@ -82,29 +82,29 @@ export interface PrintOptions {
 
 export interface PrintInstruction {
   /**
+   * Integer from 0 to 65535
    * @description Specifies the horizontal print start position in dots.
    * @description Horizontal print start position (in dots )
-   * @description Integer from 0 to 65535
    */
   addHPosition?: number;
   /**
-   * @description Integer from 0 to 255
+   * Integer from 0 to 255
    * @description Line spacing (in dots)
    */
   addLineSpace?: number;
   /**
-   * @description Integer from 0 to 255
+   * Integer from 0 to 255
    * @description Specifies the paper feed amount (in lines).
    * @description Paper feed amount (in lines)
    */
   addFeedLine?: number;
   /**
-   * @description Integer from 0 to 255
+   * Integer from 0 to 255
    * @description Specifies the paper feed amount (in dots).
    * @description Paper feed amount (in dots)
    */
   addFeedUnit?: number;
-  addTextAlign?: PrintTextAlign;
+  addTextAlign?: TextAlign;
   addText?: PrintText;
   addTextStyle?: PrintTextStyle;
   addBase64Image?: PrintBase64Image;
@@ -134,7 +134,7 @@ export interface PrintInstruction {
    * @description Adds a sheet cut command to the command buffer.
    * @description Specifies how to cut paper.
    */
-  addCut?: PrintCut;
+  addCut?: Cut;
 
   /**
    * @description Specifies the drawer kick connector.
@@ -151,7 +151,7 @@ export interface PrintInstruction {
   /**
    * @description Adds a label sheet/black mark sheet feed command to the command buffer.
    */
-  addFeedPosition?: PrintFeedPosition;
+  addFeedPosition?: FeedPosition;
   /**
    * @description Adds layout setting of the label sheet/black mark sheet to the command buffer.
    */
@@ -163,15 +163,15 @@ export interface PrintInstruction {
 
 export interface PrintTextStyle {
   /**
-   * default false
+   * @default false
    */
   reverse?: boolean;
   /**
-   * default false
+   * @default false
    */
   ul?: boolean;
   /**
-   * default false
+   * @default false
    */
   em?: boolean;
 }
@@ -179,16 +179,47 @@ export interface PrintTextStyle {
 export interface PrintText {
   value: string;
   size?: [number, number];
-  align?: PrintTextAlign;
+  align?: TextAlign;
   style?: PrintTextStyle;
 }
 
 export interface PrintBarcode {
+  /**
+   * @description Specifies barcode data as a text string. specify a string in accordance with the standard of the barcode specified in type.
+   * @description When specifying binary data which cannot be represented as a string, use the following escape sequences.
+   * @description \xnn Control code (set nn in hexadecimal)
+   * @description \\ Back slash
+   */
   value: string;
+  /**
+   * @default CODE_39
+   * @description Specifies the barcode type.
+   */
+  type: BarcodeType;
+  /**
+   * @default FONT_A
+   * @description Specifies the HRI font.
+   */
+  font?: BarcodeFont;
+  /**
+   * @default HRI_BELOW
+   * @description Specifies the HRI position.
+   */
+  hri?: BarcodeHri;
+  /**
+   * @default 2 Integer from 2 to 6
+   * @description Specifies the width of a single module in dots.
+   */
+  width?: number;
+  /**
+   * @default 100 Integer from 1 to 255
+   * @description Specifies the height of the barcode in dots.
+   */
+  height?: number;
 }
 
 export interface PrintLayout {
-  type: PrintLayoutType;
+  type: LayoutType;
   /**
    * @description Specifies the paper width (in 0.1 mm units).
    * @description TM Printer Models Integer from 1 to 10000
@@ -264,7 +295,7 @@ export interface PrintHorizontalLine {
   /**
    * @description Specifies the ruled line type.
    */
-  lineStyle: PrintLineStyle;
+  lineStyle: LineStyle;
 }
 export interface PrintVerticalLine {
   /**
@@ -274,20 +305,20 @@ export interface PrintVerticalLine {
   /**
    * @description Specifies the ruled line type.
    */
-  lineStyle: PrintLineStyle;
+  lineStyle: LineStyle;
   /**
    * @description Returns the ID of the ruled line printed by this API.
    */
   lineId: number[];
 }
 
-export type PrintTextAlign = 'left' | 'right' | 'center';
+export type TextAlign = 'left' | 'right' | 'center';
 
-export type PrintLayoutType = 'receipt' | 'receipt_bm' | 'label' | 'label_bm';
+export type LayoutType = 'receipt' | 'receipt_bm' | 'label' | 'label_bm';
 
-export type PrintFeedPosition = 'peeling' | 'cutting' | 'current_tof' | 'next_tof';
+export type FeedPosition = 'peeling' | 'cutting' | 'current_tof' | 'next_tof';
 
-export type PrintCut =
+export type Cut =
   | 'cut_feed'
   | 'cut_no_feed'
   | 'cut_reserve'
@@ -300,7 +331,7 @@ export type PulseTime = 'pulse_100' | 'pulse_200' | 'pulse_300' | 'pulse_300' | 
 
 export interface PrintBase64Image {
   /**
-   * value Base64 image string
+   * Base64 image string
    */
   value: string;
   /**
@@ -312,13 +343,54 @@ export interface PrintBase64Image {
    */
   y?: number;
   /**
-   * @description Specifies the width of the print area (in pixels).
+   * Specifies the width of the print area (in pixels).
    */
   width?: number;
   /**
-   * @description Specifies the height of the print area (in pixels).
+   * Specifies the height of the print area (in pixels).
    */
   height?: number;
 }
 
-export type PrintLineStyle = 'thin' | 'medium' | 'thick' | 'thin_double' | 'medium_double' | 'thick_double';
+export type LineStyle = 'thin' | 'medium' | 'thick' | 'thin_double' | 'medium_double' | 'thick_double';
+
+/**
+ * Types representing the allowed barcode types.
+ */
+export type BarcodeType =
+  | 'UPC_A'
+  | 'UPC_E'
+  | 'EAN13'
+  | 'JAN13'
+  | 'EAN8'
+  | 'JAN8'
+  | 'ITF'
+  | 'CODA_BAR'
+  | 'CODE_39' // Default type
+  | 'CODE_93'
+  | 'CODE_128'
+  | 'CODE_128_AUTO'
+  | 'GS1_128'
+  | 'GS1_DATA_BAR_OMNIDIRECTIONAL'
+  | 'GS1_DATA_BAR_TRUNCATED'
+  | 'GS1_DATA_BAR_LIMITED'
+  | 'GS1_DATA_BAR_EXPANDED';
+
+/**
+ * Types representing the allowed barcode fonts.
+ */
+export type BarcodeFont =
+  | 'FONT_A' // Default font
+  | 'FONT_B'
+  | 'FONT_C'
+  | 'FONT_D'
+  | 'FONT_E';
+
+/**
+ * Types representing the allowed barcode HRI (Human Readable Interpretation) positions.
+ */
+export type BarcodeHri =
+  | 'HRI_NONE' // No HRI
+  | 'HRI_ABOVE' // HRI above the barcode
+  | 'HRI_BELOW' // Default: HRI below the barcode
+  | 'HRI_BOTH'; // HRI above and below the barcode

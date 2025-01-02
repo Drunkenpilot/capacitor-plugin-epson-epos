@@ -2,7 +2,12 @@
 
 A capacitorjs plugin for Epson Pos Printer
 
-Under development
+## Android
+- ePos SDK: V2.29.0.a
+- Only tested with TM_T20III Ethernet / TM_T20 USB
+
+## Roadmap
+- Add iOS support
 
 ## Install
 
@@ -15,6 +20,7 @@ npx cap sync
 
 <docgen-index>
 
+* [`requestPermission()`](#requestpermission)
 * [`startDiscovery(...)`](#startdiscovery)
 * [`stopDiscovery()`](#stopdiscovery)
 * [`print(...)`](#print)
@@ -27,15 +33,26 @@ npx cap sync
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
+### requestPermission()
+
+```typescript
+requestPermission() => Promise<{ success: boolean; }>
+```
+
+**Returns:** <code>Promise&lt;{ success: boolean; }&gt;</code>
+
+--------------------
+
+
 ### startDiscovery(...)
 
 ```typescript
-startDiscovery(options: StartDiscoveryOptions) => Promise<DiscoveryResult>
+startDiscovery(options: DiscoveryOptions) => Promise<DiscoveryResult>
 ```
 
-| Param         | Type                                                                    |
-| ------------- | ----------------------------------------------------------------------- |
-| **`options`** | <code><a href="#startdiscoveryoptions">StartDiscoveryOptions</a></code> |
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#discoveryoptions">DiscoveryOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#discoveryresult">DiscoveryResult</a>&gt;</code>
 
@@ -97,13 +114,13 @@ finalizePrinter() => Promise<{ message: string; }>
 | **`Target`**      | <code>string</code> |
 
 
-#### StartDiscoveryOptions
+#### DiscoveryOptions
 
-| Prop            | Type                                                            | Default                        |
-| --------------- | --------------------------------------------------------------- | ------------------------------ |
-| **`timeout`**   | <code>number</code>                                             | <code>10000</code>             |
-| **`broadcast`** | <code>string</code>                                             | <code>'255.255.255.255'</code> |
-| **`portType`**  | <code><a href="#epsoneposporttype">EpsonEposPortType</a></code> | <code>'ALL'</code>             |
+| Prop            | Type                                                            | Default                           |
+| --------------- | --------------------------------------------------------------- | --------------------------------- |
+| **`timeout`**   | <code>number</code>                                             | <code>10000 (milliseconds)</code> |
+| **`broadcast`** | <code>string</code>                                             | <code>'255.255.255.255'</code>    |
+| **`portType`**  | <code><a href="#epsoneposporttype">EpsonEposPortType</a></code> | <code>'ALL'</code>                |
 
 
 #### PrintOptions
@@ -118,26 +135,26 @@ finalizePrinter() => Promise<{ message: string; }>
 
 #### PrintInstruction
 
-| Prop                  | Type                                                                                                      |
-| --------------------- | --------------------------------------------------------------------------------------------------------- |
-| **`addHPosition`**    | <code>number</code>                                                                                       |
-| **`addLineSpace`**    | <code>number</code>                                                                                       |
-| **`addFeedLine`**     | <code>number</code>                                                                                       |
-| **`addFeedUnit`**     | <code>number</code>                                                                                       |
-| **`addTextAlign`**    | <code><a href="#printtextalign">PrintTextAlign</a></code>                                                 |
-| **`addText`**         | <code><a href="#printtext">PrintText</a></code>                                                           |
-| **`addTextStyle`**    | <code><a href="#printtextstyle">PrintTextStyle</a></code>                                                 |
-| **`addBase64Image`**  | <code><a href="#printbase64image">PrintBase64Image</a></code>                                             |
-| **`addBarcode`**      | <code><a href="#printbarcode">PrintBarcode</a></code>                                                     |
-| **`addTextSize`**     | <code>[number, number]</code>                                                                             |
-| **`addHLine`**        | <code><a href="#printhorizontalline">PrintHorizontalLine</a></code>                                       |
-| **`addVLineBegin`**   | <code><a href="#printverticalline">PrintVerticalLine</a></code>                                           |
-| **`addVLineEnd`**     | <code><a href="#pick">Pick</a>&lt;<a href="#printverticalline">PrintVerticalLine</a>, 'lineId'&gt;</code> |
-| **`addCut`**          | <code><a href="#printcut">PrintCut</a></code>                                                             |
-| **`addPulse`**        | <code><a href="#printwithpulse">PrintWithPulse</a></code>                                                 |
-| **`addCommand`**      | <code>BinaryType</code>                                                                                   |
-| **`addFeedPosition`** | <code><a href="#printfeedposition">PrintFeedPosition</a></code>                                           |
-| **`addLayout`**       | <code><a href="#printlayout">PrintLayout</a></code>                                                       |
+| Prop                  | Type                                                                                                      | Description             |
+| --------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------- |
+| **`addHPosition`**    | <code>number</code>                                                                                       | Integer from 0 to 65535 |
+| **`addLineSpace`**    | <code>number</code>                                                                                       | Integer from 0 to 255   |
+| **`addFeedLine`**     | <code>number</code>                                                                                       | Integer from 0 to 255   |
+| **`addFeedUnit`**     | <code>number</code>                                                                                       | Integer from 0 to 255   |
+| **`addTextAlign`**    | <code><a href="#textalign">TextAlign</a></code>                                                           |                         |
+| **`addText`**         | <code><a href="#printtext">PrintText</a></code>                                                           |                         |
+| **`addTextStyle`**    | <code><a href="#printtextstyle">PrintTextStyle</a></code>                                                 |                         |
+| **`addBase64Image`**  | <code><a href="#printbase64image">PrintBase64Image</a></code>                                             |                         |
+| **`addBarcode`**      | <code><a href="#printbarcode">PrintBarcode</a></code>                                                     |                         |
+| **`addTextSize`**     | <code>[number, number]</code>                                                                             |                         |
+| **`addHLine`**        | <code><a href="#printhorizontalline">PrintHorizontalLine</a></code>                                       |                         |
+| **`addVLineBegin`**   | <code><a href="#printverticalline">PrintVerticalLine</a></code>                                           |                         |
+| **`addVLineEnd`**     | <code><a href="#pick">Pick</a>&lt;<a href="#printverticalline">PrintVerticalLine</a>, 'lineId'&gt;</code> |                         |
+| **`addCut`**          | <code><a href="#cut">Cut</a></code>                                                                       |                         |
+| **`addPulse`**        | <code><a href="#printwithpulse">PrintWithPulse</a></code>                                                 |                         |
+| **`addCommand`**      | <code>BinaryType</code>                                                                                   |                         |
+| **`addFeedPosition`** | <code><a href="#feedposition">FeedPosition</a></code>                                                     |                         |
+| **`addLayout`**       | <code><a href="#printlayout">PrintLayout</a></code>                                                       |                         |
 
 
 #### PrintText
@@ -146,52 +163,57 @@ finalizePrinter() => Promise<{ message: string; }>
 | ----------- | --------------------------------------------------------- |
 | **`value`** | <code>string</code>                                       |
 | **`size`**  | <code>[number, number]</code>                             |
-| **`align`** | <code><a href="#printtextalign">PrintTextAlign</a></code> |
+| **`align`** | <code><a href="#textalign">TextAlign</a></code>           |
 | **`style`** | <code><a href="#printtextstyle">PrintTextStyle</a></code> |
 
 
 #### PrintTextStyle
 
-| Prop          | Type                 | Description   |
-| ------------- | -------------------- | ------------- |
-| **`reverse`** | <code>boolean</code> | default false |
-| **`ul`**      | <code>boolean</code> | default false |
-| **`em`**      | <code>boolean</code> | default false |
+| Prop          | Type                 | Default            |
+| ------------- | -------------------- | ------------------ |
+| **`reverse`** | <code>boolean</code> | <code>false</code> |
+| **`ul`**      | <code>boolean</code> | <code>false</code> |
+| **`em`**      | <code>boolean</code> | <code>false</code> |
 
 
 #### PrintBase64Image
 
-| Prop         | Type                | Description               |
-| ------------ | ------------------- | ------------------------- |
-| **`value`**  | <code>string</code> | value Base64 image string |
-| **`x`**      | <code>number</code> |                           |
-| **`y`**      | <code>number</code> |                           |
-| **`width`**  | <code>number</code> |                           |
-| **`height`** | <code>number</code> |                           |
+| Prop         | Type                | Description                                         |
+| ------------ | ------------------- | --------------------------------------------------- |
+| **`value`**  | <code>string</code> | Base64 image string                                 |
+| **`x`**      | <code>number</code> |                                                     |
+| **`y`**      | <code>number</code> |                                                     |
+| **`width`**  | <code>number</code> | Specifies the width of the print area (in pixels).  |
+| **`height`** | <code>number</code> | Specifies the height of the print area (in pixels). |
 
 
 #### PrintBarcode
 
-| Prop        | Type                |
-| ----------- | ------------------- |
-| **`value`** | <code>string</code> |
+| Prop         | Type                                                | Default                                |
+| ------------ | --------------------------------------------------- | -------------------------------------- |
+| **`value`**  | <code>string</code>                                 |                                        |
+| **`type`**   | <code><a href="#barcodetype">BarcodeType</a></code> | <code>CODE_39</code>                   |
+| **`font`**   | <code><a href="#barcodefont">BarcodeFont</a></code> | <code>FONT_A</code>                    |
+| **`hri`**    | <code><a href="#barcodehri">BarcodeHri</a></code>   | <code>HRI_BELOW</code>                 |
+| **`width`**  | <code>number</code>                                 | <code>2 Integer from 2 to 6</code>     |
+| **`height`** | <code>number</code>                                 | <code>100 Integer from 1 to 255</code> |
 
 
 #### PrintHorizontalLine
 
-| Prop            | Type                                                      |
-| --------------- | --------------------------------------------------------- |
-| **`position`**  | <code>[number, number]</code>                             |
-| **`lineStyle`** | <code><a href="#printlinestyle">PrintLineStyle</a></code> |
+| Prop            | Type                                            |
+| --------------- | ----------------------------------------------- |
+| **`position`**  | <code>[number, number]</code>                   |
+| **`lineStyle`** | <code><a href="#linestyle">LineStyle</a></code> |
 
 
 #### PrintVerticalLine
 
-| Prop            | Type                                                      |
-| --------------- | --------------------------------------------------------- |
-| **`position`**  | <code>number</code>                                       |
-| **`lineStyle`** | <code><a href="#printlinestyle">PrintLineStyle</a></code> |
-| **`lineId`**    | <code>number[]</code>                                     |
+| Prop            | Type                                            |
+| --------------- | ----------------------------------------------- |
+| **`position`**  | <code>number</code>                             |
+| **`lineStyle`** | <code><a href="#linestyle">LineStyle</a></code> |
+| **`lineId`**    | <code>number[]</code>                           |
 
 
 #### PrintWithPulse
@@ -204,15 +226,15 @@ finalizePrinter() => Promise<{ message: string; }>
 
 #### PrintLayout
 
-| Prop               | Type                                                        |
-| ------------------ | ----------------------------------------------------------- |
-| **`type`**         | <code><a href="#printlayouttype">PrintLayoutType</a></code> |
-| **`width`**        | <code>number</code>                                         |
-| **`height`**       | <code>number</code>                                         |
-| **`marginTop`**    | <code>number</code>                                         |
-| **`marginBottom`** | <code>number</code>                                         |
-| **`offsetCut`**    | <code>number</code>                                         |
-| **`offsetLabel`**  | <code>number</code>                                         |
+| Prop               | Type                                              |
+| ------------------ | ------------------------------------------------- |
+| **`type`**         | <code><a href="#layouttype">LayoutType</a></code> |
+| **`width`**        | <code>number</code>                               |
+| **`height`**       | <code>number</code>                               |
+| **`marginTop`**    | <code>number</code>                               |
+| **`marginBottom`** | <code>number</code>                               |
+| **`offsetCut`**    | <code>number</code>                               |
+| **`offsetLabel`**  | <code>number</code>                               |
 
 
 ### Type Aliases
@@ -223,12 +245,33 @@ finalizePrinter() => Promise<{ message: string; }>
 <code>'ALL' | 'TCP' | 'BLUETOOTH' | 'USB'</code>
 
 
-#### PrintTextAlign
+#### TextAlign
 
 <code>'left' | 'right' | 'center'</code>
 
 
-#### PrintLineStyle
+#### BarcodeType
+
+Types representing the allowed barcode types.
+
+<code>'UPC_A' | 'UPC_E' | 'EAN13' | 'JAN13' | 'EAN8' | 'JAN8' | 'ITF' | 'CODA_BAR' | 'CODE_39' | 'CODE_93' | 'CODE_128' | 'CODE_128_AUTO' | 'GS1_128' | 'GS1_DATA_BAR_OMNIDIRECTIONAL' | 'GS1_DATA_BAR_TRUNCATED' | 'GS1_DATA_BAR_LIMITED' | 'GS1_DATA_BAR_EXPANDED'</code>
+
+
+#### BarcodeFont
+
+Types representing the allowed barcode fonts.
+
+<code>'FONT_A' | 'FONT_B' | 'FONT_C' | 'FONT_D' | 'FONT_E'</code>
+
+
+#### BarcodeHri
+
+Types representing the allowed barcode HRI (Human Readable Interpretation) positions.
+
+<code>'HRI_NONE' | 'HRI_ABOVE' | 'HRI_BELOW' | 'HRI_BOTH'</code>
+
+
+#### LineStyle
 
 <code>'thin' | 'medium' | 'thick' | 'thin_double' | 'medium_double' | 'thick_double'</code>
 
@@ -240,7 +283,7 @@ From T, pick a set of properties whose keys are in the union K
 <code>{ [P in K]: T[P]; }</code>
 
 
-#### PrintCut
+#### Cut
 
 <code>'cut_feed' | 'cut_no_feed' | 'cut_reserve' | 'full_cut_feed' | 'full_cut_no_feed' | 'full_cut_reserve'</code>
 
@@ -255,12 +298,12 @@ From T, pick a set of properties whose keys are in the union K
 <code>'pulse_100' | 'pulse_200' | 'pulse_300' | 'pulse_300' | 'pulse_400' | 'pulse_500'</code>
 
 
-#### PrintFeedPosition
+#### FeedPosition
 
 <code>'peeling' | 'cutting' | 'current_tof' | 'next_tof'</code>
 
 
-#### PrintLayoutType
+#### LayoutType
 
 <code>'receipt' | 'receipt_bm' | 'label' | 'label_bm'</code>
 

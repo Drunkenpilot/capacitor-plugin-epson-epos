@@ -1,5 +1,6 @@
 package be.betalife.plugin.capacitor;
 
+import com.epson.epos2.discovery.Discovery;
 import com.epson.epos2.printer.Printer;
 import com.getcapacitor.JSArray;
 
@@ -8,137 +9,107 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class PrinterUtils {
-    public static int parsePrinterLang(String langCode) {
-        switch (langCode.toUpperCase()) {
-            case "JAPANESE":
-                return Printer.LANG_JA;
-            case "CHINESE_SC":
-                return Printer.LANG_ZH_CN;
-            case "CHINESE_TC":
-                return Printer.LANG_ZH_TW;
-            case "KOREAN":
-                return Printer.LANG_KO;
-            case "THAI":
-                return Printer.LANG_TH;
-            case "SOUTHASIA":
-                return Printer.LANG_VI;
-            default:
-                return Printer.LANG_EN;
 
+
+    public static int parsePrinterPortType(String portType) {
+        if (portType == null) {
+            return Discovery.PORTTYPE_ALL;
         }
+        return switch (portType.toUpperCase()) {
+            case "TCP" -> Discovery.PORTTYPE_TCP;
+            case "BLUETOOTH" -> Discovery.PORTTYPE_BLUETOOTH;
+            case "USB" -> Discovery.PORTTYPE_USB;
+            default -> Discovery.PORTTYPE_ALL;
+        };
+    }
+
+    public static int parsePrinterLang(String langCode) {
+        if (langCode == null) {
+            return Printer.LANG_EN;
+        }
+        return switch (langCode.toUpperCase()) {
+            case "JAPANESE" -> Printer.LANG_JA;
+            case "CHINESE_SC" -> Printer.LANG_ZH_CN;
+            case "CHINESE_TC" -> Printer.LANG_ZH_TW;
+            case "KOREAN" -> Printer.LANG_KO;
+            case "THAI" -> Printer.LANG_TH;
+            case "SOUTHASIA" -> Printer.LANG_VI;
+            default -> Printer.LANG_EN;
+        };
     }
 
     public static int parsePrinterSeries(String printerSeriesCode) {
-        switch (printerSeriesCode.toUpperCase()) {
-            case "TM_M10":
-                return Printer.TM_M10;
-            case "TM_M30":
-                return Printer.TM_M30;
-            case "TM_P20":
-                return Printer.TM_P20;
-            case "TM_P60":
-                return Printer.TM_P60;
-            case "TM_P60II":
-                return Printer.TM_P60II;
-            case "TM_P80":
-                return Printer.TM_P80;
-            case "TM_T20":
-                return Printer.TM_T20;
-            case "TM_T60":
-                return Printer.TM_T60;
-            case "TM_T70":
-                return Printer.TM_T70;
-            case "TM_T81":
-                return Printer.TM_T81;
-            case "TM_T82":
-                return Printer.TM_T82;
-            case "TM_T83":
-                return Printer.TM_T83;
-            case "TM_T83III":
-                return Printer.TM_T83III;
-            case "TM_T88":
-                return Printer.TM_T88;
-            case "TM_T90":
-                return Printer.TM_T90;
-            case "TM_T90KP":
-                return Printer.TM_T90KP;
-            case "TM_T100":
-                return Printer.TM_T100;
-            case "TM_U220":
-                return Printer.TM_U220;
-            case "TM_U330":
-                return Printer.TM_U330;
-            case "TM_L90":
-                return Printer.TM_L90;
-            case "TM_H6000":
-                return Printer.TM_H6000;
-            case "TM_M30II":
-                return Printer.TM_M30II;
-            case "TS_100":
-                return Printer.TS_100;
-            case "TM_M50":
-                return Printer.TM_M50;
-            case "TM_T88VII":
-                return Printer.TM_T88VII;
-            case "TM_L90LFC":
-                return Printer.TM_L90LFC;
-            case "EU_M30":
-                return Printer.EU_M30;
-            case "TM_L100":
-                return Printer.TM_L100;
-            case "TM_P20II":
-                return Printer.TM_P20II;
-            case "TM_P80II":
-                return Printer.TM_P80II;
-            case "TM_M30III":
-                return Printer.TM_M30III;
-            case "TM_M50II":
-                return Printer.TM_M50II;
-            case "TM_M55":
-                return Printer.TM_M55;
-            case "TM_U220II":
-                return Printer.TM_U220II;
-            default:
-                // 如果输入型号不匹配，返回默认型号
-                return Printer.TM_M10;
+        if (printerSeriesCode == null) {
+            return Printer.TM_M10;
         }
+        return switch (printerSeriesCode.toUpperCase()) {
+            case "TM_M10" -> Printer.TM_M10;
+            case "TM_M30" -> Printer.TM_M30;
+            case "TM_P20" -> Printer.TM_P20;
+            case "TM_P60" -> Printer.TM_P60;
+            case "TM_P60II" -> Printer.TM_P60II;
+            case "TM_P80" -> Printer.TM_P80;
+            case "TM_T20" -> Printer.TM_T20;
+            case "TM_T60" -> Printer.TM_T60;
+            case "TM_T70" -> Printer.TM_T70;
+            case "TM_T81" -> Printer.TM_T81;
+            case "TM_T82" -> Printer.TM_T82;
+            case "TM_T83" -> Printer.TM_T83;
+            case "TM_T83III" -> Printer.TM_T83III;
+            case "TM_T88" -> Printer.TM_T88;
+            case "TM_T90" -> Printer.TM_T90;
+            case "TM_T90KP" -> Printer.TM_T90KP;
+            case "TM_T100" -> Printer.TM_T100;
+            case "TM_U220" -> Printer.TM_U220;
+            case "TM_U330" -> Printer.TM_U330;
+            case "TM_L90" -> Printer.TM_L90;
+            case "TM_H6000" -> Printer.TM_H6000;
+            case "TM_M30II" -> Printer.TM_M30II;
+            case "TS_100" -> Printer.TS_100;
+            case "TM_M50" -> Printer.TM_M50;
+            case "TM_T88VII" -> Printer.TM_T88VII;
+            case "TM_L90LFC" -> Printer.TM_L90LFC;
+            case "EU_M30" -> Printer.EU_M30;
+            case "TM_L100" -> Printer.TM_L100;
+            case "TM_P20II" -> Printer.TM_P20II;
+            case "TM_P80II" -> Printer.TM_P80II;
+            case "TM_M30III" -> Printer.TM_M30III;
+            case "TM_M50II" -> Printer.TM_M50II;
+            case "TM_M55" -> Printer.TM_M55;
+            case "TM_U220II" -> Printer.TM_U220II;
+            default ->
+                // 如果输入型号不匹配，返回默认型号
+                    Printer.TM_M10;
+        };
     }
 
     public static int parseTextAlign(String code) {
-        switch (code.toUpperCase()) {
-            case "LEFT":
-                return Printer.ALIGN_LEFT;
-            case "CENTER":
-                return Printer.ALIGN_CENTER;
-            case "RIGHT":
-                return Printer.ALIGN_RIGHT;
-            default:
-                return Printer.ALIGN_LEFT;
+        if (code == null) {
+            return Printer.ALIGN_LEFT;
         }
+        return switch (code.toLowerCase()) {
+            case "center" -> Printer.ALIGN_CENTER;
+            case "right" -> Printer.ALIGN_RIGHT;
+            default -> Printer.ALIGN_LEFT;
+        };
     }
 
     public static int parseCutType(String cut) {
-        switch (cut.toLowerCase()) {
-            case "cut_feed":
-                return Printer.CUT_FEED;
-            case "cut_no_feed":
-                return Printer.CUT_NO_FEED;
-            case "cut_reserve":
-                return Printer.CUT_RESERVE;
-            case "full_cut_feed":
-                return Printer.FULL_CUT_FEED;
-            case "full_cut_no_feed":
-                return Printer.FULL_CUT_NO_FEED;
-            case "full_cut_reserve":
-                return Printer.FULL_CUT_RESERVE;
-            default:
-                return Printer.CUT_FEED;
+        if (cut == null) {
+            return Printer.CUT_FEED;
         }
+        return switch (cut.toLowerCase()) {
+            case "cut_no_feed" -> Printer.CUT_NO_FEED;
+            case "cut_reserve" -> Printer.CUT_RESERVE;
+            case "full_cut_feed" -> Printer.FULL_CUT_FEED;
+            case "full_cut_no_feed" -> Printer.FULL_CUT_NO_FEED;
+            case "full_cut_reserve" -> Printer.FULL_CUT_RESERVE;
+            default -> Printer.CUT_FEED;
+        };
     }
 
     public static int parseDrawerPin(String pin) {
@@ -146,73 +117,116 @@ public class PrinterUtils {
     }
 
     public static int parsePulseTime(String time) {
-        switch (time.toLowerCase()) {
-            case "pulse_100":
-                return Printer.PULSE_100;
-            case "pulse_200":
-                return Printer.PULSE_200;
-            case "pulse_300":
-                return Printer.PULSE_300;
-            case "pulse_400":
-                return Printer.PULSE_400;
-            case "pulse_500":
-                return Printer.PULSE_500;
-            default:
-                return Printer.PULSE_100;
+        if (time == null) {
+            return Printer.PULSE_100;
         }
+        return switch (time.toLowerCase()) {
+            case "pulse_200" -> Printer.PULSE_200;
+            case "pulse_300" -> Printer.PULSE_300;
+            case "pulse_400" -> Printer.PULSE_400;
+            case "pulse_500" -> Printer.PULSE_500;
+            default -> Printer.PULSE_100;
+        };
     }
 
     public static int parseFeedPosition(String position) {
-        switch (position.toLowerCase()) {
-            case "peeling":
-                return Printer.FEED_PEELING;
-            case "cutting":
-                return Printer.FEED_CUTTING;
-            case "current_tof":
-                return Printer.FEED_CURRENT_TOF;
-            case "next_tof":
-                return Printer.FEED_NEXT_TOF;
-            default:
-                return Printer.FEED_PEELING;
+        if (position == null) {
+            return Printer.FEED_PEELING;
         }
+        return switch (position.toLowerCase()) {
+            case "cutting" -> Printer.FEED_CUTTING;
+            case "current_tof" -> Printer.FEED_CURRENT_TOF;
+            case "next_tof" -> Printer.FEED_NEXT_TOF;
+            default -> Printer.FEED_PEELING;
+        };
     }
 
     public static int parseLayoutType(String type) {
-        switch (type.toLowerCase()) {
-            case "receipt":
-                return Printer.LAYOUT_RECEIPT;
-            case "receipt_bm":
-                return Printer.LAYOUT_RECEIPT_BM;
-            case "label":
-                return Printer.LAYOUT_LABEL;
-            case "label_bm":
-                return Printer.LAYOUT_LABEL_BM;
-            default:
-                return Printer.LAYOUT_RECEIPT;
+        if (type == null) {
+            return Printer.LAYOUT_RECEIPT;
         }
+        return switch (type.toLowerCase()) {
+            case "receipt_bm" -> Printer.LAYOUT_RECEIPT_BM;
+            case "label" -> Printer.LAYOUT_LABEL;
+            case "label_bm" -> Printer.LAYOUT_LABEL_BM;
+            default -> Printer.LAYOUT_RECEIPT;
+        };
     }
 
     public static int parseLineStyle(String lineStyle) {
-        switch (lineStyle) {
-            case "thin":
-                return Printer.LINE_THIN;
-            case "medium":
-                return Printer.LINE_MEDIUM;
-            case "thick":
-                return Printer.LINE_THICK;
-            case "thin_double":
-                return Printer.LINE_THIN_DOUBLE;
-            case "medium_double":
-                return Printer.LINE_MEDIUM_DOUBLE;
-            case "thick_double":
-                return Printer.LINE_THICK_DOUBLE;
-            default:
-                return Printer.LINE_THIN;
+        if (lineStyle == null) {
+            return Printer.LINE_THIN;
         }
+        return switch (lineStyle.toLowerCase()) {
+            case "medium" -> Printer.LINE_MEDIUM;
+            case "thick" -> Printer.LINE_THICK;
+            case "thin_double" -> Printer.LINE_THIN_DOUBLE;
+            case "medium_double" -> Printer.LINE_MEDIUM_DOUBLE;
+            case "thick_double" -> Printer.LINE_THICK_DOUBLE;
+            default -> Printer.LINE_THIN;
+        };
+    }
+
+    public static int parseBarcodeType(String type) {
+        if (type == null) {
+            return Printer.BARCODE_CODE39;
+        }
+        return switch (type.toUpperCase()) {
+            case "UPC_A" -> Printer.BARCODE_UPC_A;
+            case "UPC_E" -> Printer.BARCODE_UPC_E;
+            case "EAN13" -> Printer.BARCODE_EAN13;
+            case "JAN13" -> Printer.BARCODE_JAN13;
+            case "EAN8" -> Printer.BARCODE_EAN8;
+            case "JAN8" -> Printer.BARCODE_JAN8;
+            case "ITF" -> Printer.BARCODE_ITF;
+            case "CODA_BAR" -> Printer.BARCODE_CODABAR;
+            case "CODE_93" -> Printer.BARCODE_CODE93;
+            case "CODE_128" -> Printer.BARCODE_CODE128;
+            case "CODE_128_AUTO" -> Printer.BARCODE_CODE128_AUTO;
+            case "GS1_128" -> Printer.BARCODE_GS1_128;
+            case "GS1_DATA_BAR_OMNIDIRECTIONAL" -> Printer.BARCODE_GS1_DATABAR_OMNIDIRECTIONAL;
+            case "GS1_DATA_BAR_TRUNCATED" -> Printer.BARCODE_GS1_DATABAR_TRUNCATED;
+            case "GS1_DATA_BAR_LIMITED" -> Printer.BARCODE_GS1_DATABAR_LIMITED;
+            case "GS1_DATA_BAR_EXPANDED" -> Printer.BARCODE_GS1_DATABAR_EXPANDED;
+            default -> Printer.BARCODE_CODE39;
+        };
+    }
+
+    public static int parseBarcodeFont(String font) {
+        if (font == null) {
+            return Printer.FONT_A;
+        }
+        return switch (font.toUpperCase()) {
+            case "FONT_B" -> Printer.FONT_B;
+            case "FONT_C" -> Printer.FONT_C;
+            case "FONT_D" -> Printer.FONT_D;
+            case "FONT_E" -> Printer.FONT_E;
+            default -> Printer.FONT_A;
+        };
+    }
+
+    public static int parseBarcodeHri(String hri) {
+        if (hri == null) {
+            return Printer.HRI_BELOW;
+        }
+        return switch (hri.toUpperCase()) {
+            case "HRI_NONE" -> Printer.HRI_NONE;
+            case "HRI_ABOVE" -> Printer.HRI_ABOVE;
+            case "HRI_BOTH" -> Printer.HRI_BOTH;
+            default -> Printer.HRI_BELOW;
+        };
     }
 
     public static <K, V> V getOrDefault(Map<K, V> map, K key, V defaultValue) {
         return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <K, V> HashMap<K, V> castToMap(Object obj) {
+        if (obj instanceof HashMap) {
+            return (HashMap<K, V>) obj;
+        }
+        throw new IllegalArgumentException("Object is not a HashMap");
     }
 
     public static List<HashMap<String, Object>> parseInstructions(JSArray jsArray) throws Exception {
@@ -297,6 +311,11 @@ public class PrinterUtils {
                 JSONObject barcodeObject = jsonObject.getJSONObject("addBarcode");
                 HashMap<String, Object> barcodeCommand = new HashMap<>();
                 barcodeCommand.put("value", barcodeObject.getString("value"));
+                barcodeCommand.put("type", barcodeObject.getString("type"));
+                barcodeCommand.put("hri", barcodeObject.getString("hri"));
+                barcodeCommand.put("font", barcodeObject.getString("font"));
+                barcodeCommand.put("width", barcodeObject.getInt("width"));
+                barcodeCommand.put("height", barcodeObject.getInt("height"));
                 command.put("addBarcode", barcodeCommand);
             }
             if (jsonObject.has("addTextSize")) {
