@@ -205,18 +205,34 @@ public class PrinterManager implements ReceiveListener {
                                 byte[] imageBytes = Base64.decode(base64, Base64.DEFAULT);
                                 Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
 
-                                if (width > 0 && bitmap.getWidth() > width) {
-                                    bitmap = Bitmap.createScaledBitmap(bitmap, width, (bitmap.getHeight() * width) / bitmap.getWidth(), false);
-                                    log("Scaled Image Width: " + bitmap.getWidth());
-                                    log("Scaled Image Height: " + bitmap.getHeight());
+                                int finalWidth = bitmap.getWidth();
+                                int finalHeight = bitmap.getHeight();
+
+                                log("Width: " + width);
+                                log("height: " + height);
+                                log("Image Width: " + bitmap.getWidth());
+                                log("Image Height: " + bitmap.getHeight());
+
+                                if (width > 0) {
+                                    if (bitmap.getWidth() > width) {
+                                        // 缩小图片
+                                        bitmap = Bitmap.createScaledBitmap(bitmap, width, (bitmap.getHeight() * width) / bitmap.getWidth(), false);
+                                    } else if (bitmap.getWidth() < width) {
+                                        // 放大图片
+                                        bitmap = Bitmap.createScaledBitmap(bitmap, width, (bitmap.getHeight() * width) / bitmap.getWidth(), true);
+                                    }
+                                    finalWidth = bitmap.getWidth();
+                                    finalHeight = bitmap.getHeight();
+                                    log("Scaled Image Width: " + finalWidth);
+                                    log("Scaled Image Height: " + finalHeight);
                                 }
 
                                 mPrinter.addImage(
                                         bitmap,
                                         x,
                                         y,
-                                        width > 0 ? width : bitmap.getWidth(),
-                                        height > 0 ? height : bitmap.getHeight(),
+                                        finalWidth,
+                                        finalHeight,
                                         Printer.COLOR_1,
                                         Printer.MODE_MONO,
                                         Printer.HALFTONE_DITHER,
