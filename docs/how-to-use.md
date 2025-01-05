@@ -118,7 +118,7 @@ import {
         },
         {
           addBase64Image: {
-              value: `base64 image string...`,
+              value: `base64 image string...`, // with or without base64 prefix
               width: 376,
             }
         },
