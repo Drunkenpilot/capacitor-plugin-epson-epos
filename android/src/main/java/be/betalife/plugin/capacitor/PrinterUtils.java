@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PrinterUtils {
 
@@ -347,12 +349,12 @@ public class PrinterUtils {
 
                 String base64Value = imageObject.getString("value");
                 // Remove prefix if present
-                if (base64Value.startsWith("data:image/")) {
-                    int commaIndex = base64Value.indexOf(",");
-                    if (commaIndex != -1) {
-                        base64Value = base64Value.substring(commaIndex + 1);
-                    }
-                }
+                // 正则表达式匹配所有图片类型的 base64 数据
+                String regex = "data:image/(jpeg|png|gif|bmp|webp|svg\\+xml);base64[^\\s]*";
+                Pattern pattern = Pattern.compile(regex);
+                Matcher matcher = pattern.matcher(base64Value);
+                // 替换匹配到的字符串
+                base64Value = matcher.replaceAll("");
 
                 imageCommand.put("value", base64Value);
 
