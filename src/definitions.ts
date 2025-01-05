@@ -395,7 +395,45 @@ export interface PrintBase64Image {
    * Specifies the height of the print area (in pixels).
    */
   height?: number;
+
+  /**
+   * Specifies the color.
+   * @default COLOR_1
+   */
+  color?: ImageColor;
+
+  /**
+   * Specifies the mode.
+   * @default MONO
+   */
+  mode?: ImageMode;
+
+  /**
+   * Enables or disables compression. Compressing print images can prevent white banding or streaks from occurring on printed images.
+   * This works well when connecting with the printer using Bluetooth.
+   * @default AUTO
+   */
+  compress?: ImageHalfTone;
+
+  /**
+   * Specifies the halftone
+   */
+  halftone?: ImageHalfTone;
+
+  /**
+   * Specifies the brightness compensation value.
+   * @default 1
+   */
+  brightness?: number;
 }
+
+export type ImageColor = 'COLOR_1' | 'COLOR_2' | 'COLOR_3' | 'COLOR_4' | 'COLOR_NONE';
+
+export type ImageMode = 'MONO' | 'GRAY16' | 'HIGH_DENSITY';
+
+export type ImageHalfTone = 'DITHER' | 'THRESHOLD' | 'ERROR_DIFFUSION';
+
+export type ImageCompress = 'AUTO' | 'DEFLATE' | 'NONE';
 
 export type LineStyle = 'thin' | 'medium' | 'thick' | 'thin_double' | 'medium_double' | 'thick_double';
 

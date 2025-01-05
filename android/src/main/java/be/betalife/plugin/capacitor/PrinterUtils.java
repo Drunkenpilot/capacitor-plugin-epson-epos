@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class PrinterUtils {
 
 
@@ -266,6 +267,54 @@ public class PrinterUtils {
         };
     }
 
+    public static int parseImageColor(String color) {
+        if (color == null) {
+            return Printer.COLOR_1;
+        }
+        return switch (color.toUpperCase()) {
+            case "COLOR_2" -> Printer.COLOR_2;
+            case "COLOR_3" -> Printer.COLOR_3;
+            case "COLOR_4" -> Printer.COLOR_4;
+            case "COLOR_NONE" -> Printer.COLOR_NONE;
+            default -> Printer.COLOR_1;
+        };
+    }
+
+    public static int parseImageMode(String mode) {
+        if (mode == null) {
+            return Printer.MODE_MONO;
+        }
+        return switch (mode.toUpperCase()) {
+            case "GRAY16" -> Printer.MODE_GRAY16;
+            case "HIGH_DENSITY" -> Printer.MODE_MONO_HIGH_DENSITY;
+            default -> Printer.MODE_MONO;
+        };
+    }
+
+    public static int parseImageHalftone(String halftone) {
+        if (halftone == null) {
+            return Printer.PARAM_DEFAULT;
+        }
+        return switch (halftone.toUpperCase()) {
+            case "DITHER" -> Printer.HALFTONE_DITHER;
+            case "THRESHOLD" -> Printer.HALFTONE_THRESHOLD;
+            case "ERROR_DIFFUSION" -> Printer.HALFTONE_ERROR_DIFFUSION;
+            default -> Printer.PARAM_DEFAULT;
+        };
+    }
+
+
+    public static int parseImageCompress(String compress) {
+        if (compress == null) {
+            return Printer.COMPRESS_AUTO;
+        }
+        return switch (compress.toUpperCase()) {
+            case "DEFLATE" -> Printer.COMPRESS_DEFLATE;
+            case "NONE" -> Printer.COMPRESS_NONE;
+            default -> Printer.COMPRESS_AUTO;
+        };
+    }
+
 
     public static <K, V> V getOrDefault(Map<K, V> map, K key, V defaultValue) {
         return map.containsKey(key) ? map.get(key) : defaultValue;
@@ -307,7 +356,7 @@ public class PrinterUtils {
                 Object value = textObject.get("value");
                 if (value instanceof String) {
                     command.put("addText", value);
-                } else if(value instanceof JSONArray textArray) {
+                } else if (value instanceof JSONArray textArray) {
                     StringBuilder combinedText = new StringBuilder();
 
                     for (int j = 0; j < textArray.length(); j++) {
@@ -316,7 +365,7 @@ public class PrinterUtils {
                     }
 
                     command.put("addText", combinedText.toString());
-                }else {
+                } else {
                     throw new IllegalArgumentException("Unsupported value type for addText: " + value.getClass().getName());
                 }
 
@@ -362,6 +411,19 @@ public class PrinterUtils {
                 imageCommand.put("y", imageObject.optInt("y", 0));
                 imageCommand.put("width", imageObject.optInt("width", 0));
                 imageCommand.put("height", imageObject.optInt("height", 0));
+
+                String color = imageObject.optString("color", "COLOR_1");
+                String mode = imageObject.optString("mode", "MONO");
+                String halftone = imageObject.optString("halftone", "HALFTONE_DITHER");
+                String compress = imageObject.optString("compress", "AUTO");
+                int brightness = imageObject.optInt("brightness", 1);
+                imageCommand.put("color",color);
+                imageCommand.put("mode",mode);
+                imageCommand.put("halftone",halftone);
+                imageCommand.put("compress",compress);
+                imageCommand.put("brightness",brightness);
+
+
                 command.put("addBase64Image", imageCommand);
             }
             if (jsonObject.has("addHLine")) {
@@ -403,7 +465,7 @@ public class PrinterUtils {
                     symbolCommand.put("type", symbolType);
                 }
 
-                if(symbolType.startsWith("AZTECCODE")) {
+                if (symbolType.startsWith("AZTECCODE")) {
                     if (symbolObject.has("level")) {
                         symbolCommand.put("level", symbolObject.optInt("level", 23));
                     }

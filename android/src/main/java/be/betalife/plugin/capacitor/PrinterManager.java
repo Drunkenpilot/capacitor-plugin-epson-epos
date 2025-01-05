@@ -201,43 +201,43 @@ public class PrinterManager implements ReceiveListener {
                                 int x = (int) PrinterUtils.getOrDefault(imageParams, "x", 0);
                                 int y = (int) PrinterUtils.getOrDefault(imageParams, "y", 0);
                                 int width = (int) PrinterUtils.getOrDefault(imageParams, "width", 0);
-                                int height = (int) PrinterUtils.getOrDefault(imageParams, "height", 0);
+
                                 byte[] imageBytes = Base64.decode(base64, Base64.DEFAULT);
                                 Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
 
-                                int finalWidth = bitmap.getWidth();
-                                int finalHeight = bitmap.getHeight();
-
                                 log("Width: " + width);
-                                log("height: " + height);
-                                log("Image Width: " + bitmap.getWidth());
-                                log("Image Height: " + bitmap.getHeight());
+                                log("Bitmap Width: " + bitmap.getWidth());
+                                log("Bitmap height: " + bitmap.getHeight());
 
-                                if (width > 0) {
-                                    if (bitmap.getWidth() > width) {
-                                        // 缩小图片
-                                        bitmap = Bitmap.createScaledBitmap(bitmap, width, (bitmap.getHeight() * width) / bitmap.getWidth(), false);
-                                    } else if (bitmap.getWidth() < width) {
-                                        // 放大图片
-                                        bitmap = Bitmap.createScaledBitmap(bitmap, width, (bitmap.getHeight() * width) / bitmap.getWidth(), true);
-                                    }
-                                    finalWidth = bitmap.getWidth();
-                                    finalHeight = bitmap.getHeight();
-                                    log("Scaled Image Width: " + finalWidth);
-                                    log("Scaled Image Height: " + finalHeight);
+                                if (width > 0 && bitmap.getWidth() > width) {
+                                    bitmap = Bitmap.createScaledBitmap(bitmap, width, (bitmap.getHeight() * width) / bitmap.getWidth(), false);
+                                    log("Down Scaled Image Width: " + bitmap.getWidth());
+                                    log("Down Scaled Image Height: " + bitmap.getHeight());
                                 }
+
+                                if (width > 0 && bitmap.getWidth() < width) {
+                                    bitmap = Bitmap.createScaledBitmap(bitmap, width, (bitmap.getHeight() * width) / bitmap.getWidth(), true);
+                                    log("Up Scaled Image Width: " + bitmap.getWidth());
+                                    log("Up Scaled Image Height: " + bitmap.getHeight());
+                                }
+
+                                int color = PrinterUtils.parseImageColor((String) imageParams.get("color"));
+                                int mode = PrinterUtils.parseImageMode((String) imageParams.get("mode"));
+                                int halftone = PrinterUtils.parseImageHalftone((String) imageParams.get("halftone"));
+                                int compress = PrinterUtils.parseImageCompress((String) imageParams.get("compress"));
+                                int brightness =(int) PrinterUtils.getOrDefault(imageParams, "brightness", 1);
 
                                 mPrinter.addImage(
                                         bitmap,
                                         x,
                                         y,
-                                        finalWidth,
-                                        finalHeight,
-                                        Printer.COLOR_1,
-                                        Printer.MODE_MONO,
-                                        Printer.HALFTONE_DITHER,
-                                        Printer.PARAM_DEFAULT,
-                                        Printer.COMPRESS_AUTO);
+                                        bitmap.getWidth(),
+                                        bitmap.getHeight(),
+                                        color,
+                                        mode,
+                                        halftone,
+                                        brightness,
+                                        compress);
                             } else {
                                 throw new IllegalArgumentException("Invalid value for addBase64Image");
                             }
@@ -249,9 +249,6 @@ public class PrinterManager implements ReceiveListener {
 
                                 int x1 = position.getInt(0);
                                 int x2 = position.getInt(1);
-
-                                log("H Line position ====="+x1);
-                                log("H Line position ====="+x2);
 
                                 String lineStyle = hLine.getString("lineStyle");
 
@@ -319,12 +316,11 @@ public class PrinterManager implements ReceiveListener {
                                 String symbolValue = (String) symbolParams.get("value");
                                 String symbolType = (String) symbolParams.get("type");
                                 int finalLevel;
-                                if(symbolType.startsWith("AZTECCODE")) {
+                                if(symbolType != null && symbolType.startsWith("AZTECCODE")) {
                                     finalLevel = (int) PrinterUtils.getOrDefault(symbolParams, "level", 23);
                                 } else {
                                     finalLevel = PrinterUtils.parseSymbolLevel((String) symbolParams.get("level")) ;
                                 }
-                                String symbolLevel = (String) symbolParams.get("level");
 
                                 int width = (int) PrinterUtils.getOrDefault(symbolParams, "width", 2);
                                 int height = (int) PrinterUtils.getOrDefault(symbolParams, "height", 3);

@@ -184,13 +184,18 @@ finalizePrinter() => Promise<{ message: string; }>
 
 #### PrintBase64Image
 
-| Prop         | Type                | Description                                         |
-| ------------ | ------------------- | --------------------------------------------------- |
-| **`value`**  | <code>string</code> | Base64 image string                                 |
-| **`x`**      | <code>number</code> |                                                     |
-| **`y`**      | <code>number</code> |                                                     |
-| **`width`**  | <code>number</code> | Specifies the width of the print area (in pixels).  |
-| **`height`** | <code>number</code> | Specifies the height of the print area (in pixels). |
+| Prop             | Type                                                    | Description                                                                                                                                                                                        | Default              |
+| ---------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| **`value`**      | <code>string</code>                                     | Base64 image string                                                                                                                                                                                |                      |
+| **`x`**          | <code>number</code>                                     |                                                                                                                                                                                                    |                      |
+| **`y`**          | <code>number</code>                                     |                                                                                                                                                                                                    |                      |
+| **`width`**      | <code>number</code>                                     | Specifies the width of the print area (in pixels).                                                                                                                                                 |                      |
+| **`height`**     | <code>number</code>                                     | Specifies the height of the print area (in pixels).                                                                                                                                                |                      |
+| **`color`**      | <code><a href="#imagecolor">ImageColor</a></code>       | Specifies the color.                                                                                                                                                                               | <code>COLOR_1</code> |
+| **`mode`**       | <code><a href="#imagemode">ImageMode</a></code>         | Specifies the mode.                                                                                                                                                                                | <code>MONO</code>    |
+| **`compress`**   | <code><a href="#imagehalftone">ImageHalfTone</a></code> | Enables or disables compression. Compressing print images can prevent white banding or streaks from occurring on printed images. This works well when connecting with the printer using Bluetooth. | <code>AUTO</code>    |
+| **`halftone`**   | <code><a href="#imagehalftone">ImageHalfTone</a></code> | Specifies the halftone                                                                                                                                                                             |                      |
+| **`brightness`** | <code>number</code>                                     | Specifies the brightness compensation value.                                                                                                                                                       | <code>1</code>       |
 
 
 #### PrintBarcode
@@ -266,6 +271,21 @@ finalizePrinter() => Promise<{ message: string; }>
 #### TextAlign
 
 <code>'left' | 'right' | 'center'</code>
+
+
+#### ImageColor
+
+<code>'COLOR_1' | 'COLOR_2' | 'COLOR_3' | 'COLOR_4' | 'COLOR_NONE'</code>
+
+
+#### ImageMode
+
+<code>'MONO' | 'GRAY16' | 'HIGH_DENSITY'</code>
+
+
+#### ImageHalfTone
+
+<code>'DITHER' | 'THRESHOLD' | 'ERROR_DIFFUSION'</code>
 
 
 #### BarcodeType
