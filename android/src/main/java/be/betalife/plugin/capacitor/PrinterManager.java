@@ -225,7 +225,7 @@ public class PrinterManager implements ReceiveListener {
                                 int mode = PrinterUtils.parseImageMode((String) imageParams.get("mode"));
                                 int halftone = PrinterUtils.parseImageHalftone((String) imageParams.get("halftone"));
                                 int compress = PrinterUtils.parseImageCompress((String) imageParams.get("compress"));
-                                int brightness =(int) PrinterUtils.getOrDefault(imageParams, "brightness", 1);
+                                double brightness = (Double) PrinterUtils.getOrDefault(imageParams, "brightness", 1);
 
                                 mPrinter.addImage(
                                         bitmap,
@@ -316,10 +316,10 @@ public class PrinterManager implements ReceiveListener {
                                 String symbolValue = (String) symbolParams.get("value");
                                 String symbolType = (String) symbolParams.get("type");
                                 int finalLevel;
-                                if(symbolType != null && symbolType.startsWith("AZTECCODE")) {
+                                if (symbolType != null && symbolType.startsWith("AZTECCODE")) {
                                     finalLevel = (int) PrinterUtils.getOrDefault(symbolParams, "level", 23);
                                 } else {
-                                    finalLevel = PrinterUtils.parseSymbolLevel((String) symbolParams.get("level")) ;
+                                    finalLevel = PrinterUtils.parseSymbolLevel((String) symbolParams.get("level"));
                                 }
 
                                 int width = (int) PrinterUtils.getOrDefault(symbolParams, "width", 2);
@@ -330,7 +330,7 @@ public class PrinterManager implements ReceiveListener {
                                         PrinterUtils.parseSymbolType(symbolType),
                                         finalLevel,
                                         width,
-                                        height,size);
+                                        height, size);
                             } else {
                                 throw new IllegalArgumentException("Invalid value for addSymbol");
                             }

@@ -416,12 +416,13 @@ public class PrinterUtils {
                 String mode = imageObject.optString("mode", "MONO");
                 String halftone = imageObject.optString("halftone", "HALFTONE_DITHER");
                 String compress = imageObject.optString("compress", "AUTO");
-                int brightness = imageObject.optInt("brightness", 1);
-                imageCommand.put("color",color);
-                imageCommand.put("mode",mode);
-                imageCommand.put("halftone",halftone);
-                imageCommand.put("compress",compress);
-                imageCommand.put("brightness",brightness);
+                double brightness = imageObject.optDouble("brightness", 1);
+                
+                imageCommand.put("color", color);
+                imageCommand.put("mode", mode);
+                imageCommand.put("halftone", halftone);
+                imageCommand.put("compress", compress);
+                imageCommand.put("brightness", brightness);
 
 
                 command.put("addBase64Image", imageCommand);
