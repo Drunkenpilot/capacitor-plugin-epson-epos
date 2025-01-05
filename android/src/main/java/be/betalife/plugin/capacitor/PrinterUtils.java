@@ -417,7 +417,7 @@ public class PrinterUtils {
                 String halftone = imageObject.optString("halftone", "HALFTONE_DITHER");
                 String compress = imageObject.optString("compress", "AUTO");
                 double brightness = imageObject.optDouble("brightness", 1);
-                
+
                 imageCommand.put("color", color);
                 imageCommand.put("mode", mode);
                 imageCommand.put("halftone", halftone);
